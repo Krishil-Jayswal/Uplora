@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "uplora",
   "private": true,
   "scripts": {
     "build": "turbo run build",
