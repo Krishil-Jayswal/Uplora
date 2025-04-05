@@ -1,0 +1,27 @@
+{
+  "name": "@repo/db",
+  "version": "1.0.0",
+  "description": "A prisma package for the database connection.",
+  "license": "ISC",
+  "author": "Krishil Jayswal",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsc --watch --preserveWatchOutput",
+    "build": "tsc -b"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "@repo/env": "*",
+    "prisma": "^6.5.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*"
+  }
+}

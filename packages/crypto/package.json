@@ -1,0 +1,32 @@
+{
+  "name": "@repo/crypto",
+  "version": "1.0.0",
+  "description": "A package for cryptographic functions.",
+  "license": "ISC",
+  "author": "Krishil Jayswal",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsc --watch --preserveWatchOutput",
+    "build": "tsc -b"
+  },
+  "exports": {
+    "./bcrypt": {
+      "default": "./dist/bcrypt/index.js",
+      "types": "./src/bcrypt/index.ts"
+    },
+    "./jwt": {
+      "default": "./dist/jwt/index.js",
+      "types": "./src/jwt/index.ts"
+    }
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@repo/env": "*",
+    "@types/jsonwebtoken": "^9.0.9"
+  }
+}
