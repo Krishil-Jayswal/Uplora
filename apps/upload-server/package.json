@@ -14,13 +14,16 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "simple-git": "^3.27.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
+    "@repo/crypto": "*",
     "@repo/db": "*",
     "@repo/typescript-config": "*",
     "@repo/validation": "*",
+    "@repo/redis": "*",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "eslint": "^9.24.0",

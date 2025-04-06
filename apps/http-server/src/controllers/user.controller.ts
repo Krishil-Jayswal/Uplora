@@ -11,7 +11,6 @@ export const getProjects = async (req: Request, res: Response) => {
       select: {
         id: true,
         name: true,
-        userId: true,
         github_url: true,
         status: true,
       },

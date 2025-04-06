@@ -18,8 +18,8 @@ model User {
 }
 
 enum Status {
-  uploading
-  uploaded
+  cloning
+  cloned
   deploying
   deployed
   failed
@@ -32,7 +32,16 @@ model Project {
   status     Status
   userId     String
   user       User     @relation(references: [id], fields: [userId])
-  logs       String[]
+  logs       Log[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  message   String
+  projectId String
+  project   Project  @relation(references: [id], fields: [projectId])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

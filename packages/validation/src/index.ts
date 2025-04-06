@@ -12,8 +12,26 @@ export const RegisterSchema = z.strictObject({
     .max(20, { message: "Password should not be more than 20 characters." }),
 });
 
-
 export const LoginSchema = z.strictObject({
-    email: z.string().email(),
-    password: z.string().min(6).max(20)
+  email: z.string().email(),
+  password: z.string().min(6).max(20),
 });
+
+export const GithubUrlSchema = z.strictObject({
+  githubUrl: z
+    .string()
+    .trim()
+    .regex(
+      /^https:\/\/github\.com\/[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+\.git\/?$/,
+      { message: "Must be a valid github repository url." }
+    )
+    .transform((url) => url.replace(/\/+$/, "")),
+});
+
+export enum Status {
+  CLONING = "cloning",
+  CLONED = "cloned",
+  DEPLOYING = "deploying",
+  DEPLOYED = "deployed",
+  FAILED = "failed"
+}

@@ -15,6 +15,7 @@ const EnvSchema = z.object({
   JWT_SECRET: z.string(),
   MAX_AGE: z.string(),
   UPLOAD_PORT: z.string(),
+  REDIS_URL: z.string(),
 });
 
 export const env = EnvSchema.parse(process.env);

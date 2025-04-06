@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { env } from "@repo/env";
 import { prisma } from "@repo/db";
+import V1Router from "./routes/index.route.js";
 
 const PORT = env.UPLOAD_PORT;
 
@@ -14,6 +15,8 @@ app.use(cors());
 app.get("/health", (req, res) => {
   res.status(200).json({ message: "Server is running." });
 });
+
+app.use("/api/v1", V1Router);
 
 app.listen(PORT, async (err) => {
   if (err) {

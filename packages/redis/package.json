@@ -1,0 +1,26 @@
+{
+  "name": "@repo/redis",
+  "version": "1.0.0",
+  "description": "A package for delivering redis clients.",
+  "license": "ISC",
+  "author": "Krishil Jayswal",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsc --watch --preserveWatchOutput",
+    "build": "tsc -b"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "redis": "^4.7.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@repo/env": "*"
+  }
+}
