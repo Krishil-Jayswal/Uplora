@@ -3,6 +3,7 @@ import cors from "cors";
 import { env } from "@repo/env";
 import { prisma } from "@repo/db";
 import V1Router from "./routes/index.route.js";
+import { publisher } from "@repo/redis";
 
 const PORT = env.UPLOAD_PORT;
 
@@ -25,5 +26,7 @@ app.listen(PORT, async (err) => {
   }
   await prisma.$connect();
   console.log("Database connected successfully.");
+  await publisher.connect();
+  console.log("Redis connected successfully.");
   console.log(`Upload Server is running on port ${PORT}.`);
 });

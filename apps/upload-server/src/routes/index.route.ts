@@ -6,6 +6,8 @@ import { prisma } from "@repo/db";
 import { fileURLToPath } from "url";
 import path from "path";
 import { simpleGit } from "simple-git";
+import { generateSlug } from "../utils/slug.js";
+import { publisher } from "@repo/redis";
 
 const V1Router = express.Router();
 
@@ -32,34 +34,58 @@ V1Router.post("/deploy", async (req, res) => {
         // Input Data Validation
         const validation = GithubUrlSchema.safeParse(req.body);
         if (!validation.success) {
-            res.status(400).json({ message: "Invalid data format." });
+            res.status(400).json({ message: "Invalid github repository." });
             return;
         }
 
-        // Create a Database Entry
+        // Generate slug
         const { githubUrl } = validation.data;
         const { id } = payload;
         const repoName = getNameFromRepo(githubUrl);
+        const slug = await generateSlug(repoName);
+
+        // Create a Database Entry
         const project = await prisma.project.create({
             data: {
                 name: repoName,
                 userId: id,
                 github_url: githubUrl,
                 status: Status.CLONING,
+                slug
             }
         });
 
-        // Sending the Response for polling
-        res.json({ project: {
+        // Add the project in redis
+        await publisher.hSet(`project:${project.id}`, {
             id: project.id,
             name: project.name,
             githubUrl: project.github_url,
             status: project.status,
-        } });
+            slug: project.slug,
+            createdAt: `${project.createdAt}`,
+        });
+
+        // Add the log
+        await publisher.lPush(`logs:${project.id}`, JSON.stringify({
+            createdAt: new Date(),
+            message: "Cloning the repository ..."
+        }));
+
+        // Sending the Response for polling
+        res.json({ id: project.id });
 
         // Clone the repository
-        const localpath = path.join(__dirname, `../output/${repoName}-${project.id}`);
+        const localpath = path.join(__dirname, `../output/${repoName}-${slug}`);
         simpleGit().clone(githubUrl, localpath);
+
+        // Update the status and add the log
+        await publisher
+            .multi()
+            .hSet(`project:${project.id}`, "status", "cloned")
+            .lPush(`logs:${project.id}`, JSON.stringify({
+            createdAt: new Date(),
+            message: "Repository cloned successfully."
+        })).exec();
 
         // Upload to Object Store
         

@@ -32,6 +32,7 @@ model Project {
   status     Status
   userId     String
   user       User     @relation(references: [id], fields: [userId])
+  slug       String   @unique
   logs       Log[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

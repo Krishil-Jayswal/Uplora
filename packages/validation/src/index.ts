@@ -33,5 +33,20 @@ export enum Status {
   CLONED = "cloned",
   DEPLOYING = "deploying",
   DEPLOYED = "deployed",
-  FAILED = "failed"
+  FAILED = "failed",
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  githubUrl: string;
+  status: Status;
+  slug: string;
+  userId: string;
+  createdAt: Date;
+}
+
+export interface Log {
+  createdAt: Date;
+  message: string;
 }
