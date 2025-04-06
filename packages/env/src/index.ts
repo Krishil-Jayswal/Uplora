@@ -11,9 +11,10 @@ const envPath = path.resolve(__dirname, "../../../.env");
 dotenv.config({ path: envPath });
 
 const EnvSchema = z.object({
-  PORT: z.string(),
+  HTTP_PORT: z.string(),
   JWT_SECRET: z.string(),
   MAX_AGE: z.string(),
+  UPLOAD_PORT: z.string(),
 });
 
 export const env = EnvSchema.parse(process.env);
