@@ -136,8 +136,8 @@ V1Router.post("/deploy", async (req, res) => {
       })
     );
   } catch (error) {
-    console.error("Error in deploying project: ", error);
-    res.status(500).json({ message: "Internal server error." });
+    console.error("Error in deploying project: ", (error as Error).message);
+    // res.status(500).json({ message: "Internal server error." });
   }
 });
 
