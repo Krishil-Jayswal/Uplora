@@ -1,0 +1,6 @@
+{
+    "watch": ["src"],
+    "ect": "ts",
+    "ignore": ["node_modules", "./src/output/**"],
+    "exec": "node --experimental-specifier-resolution=node --no-deprecation ./scripts/starter-script.js"
+}
