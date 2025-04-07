@@ -1,0 +1,26 @@
+{
+  "name": "@repo/object-store",
+  "version": "1.0.0",
+  "description": "A module for interactions with the object store.",
+  "license": "ISC",
+  "author": "Krishil Jayswal",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsc --watch --preserveWatchOutput",
+    "build": "tsc -b"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@azure/storage-blob": "^12.27.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@repo/env": "*"
+  }
+}

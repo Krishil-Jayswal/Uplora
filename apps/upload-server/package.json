@@ -24,6 +24,8 @@
     "@repo/typescript-config": "*",
     "@repo/validation": "*",
     "@repo/redis": "*",
+    "@repo/fs": "*",
+    "@repo/object-store": "*",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "eslint": "^9.24.0",

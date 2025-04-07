@@ -16,6 +16,8 @@ const EnvSchema = z.object({
   MAX_AGE: z.string(),
   UPLOAD_PORT: z.string(),
   REDIS_URL: z.string(),
+  BLOB_CONNECTION_URL: z.string(),
+  BLOB_CONTAINER_NAME: z.string(),
 });
 
 export const env = EnvSchema.parse(process.env);

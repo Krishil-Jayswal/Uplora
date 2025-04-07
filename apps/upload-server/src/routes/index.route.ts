@@ -8,12 +8,15 @@ import path from "path";
 import { simpleGit } from "simple-git";
 import { generateSlug } from "../utils/slug.js";
 import { publisher } from "@repo/redis";
+import { listAllFiles } from "@repo/fs";
+import { uploadFile } from "@repo/object-store";
 
 const V1Router = express.Router();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// TODO: Add more detailed logs.
 V1Router.post("/deploy", async (req, res) => {
     try {
         // Check for Authentication
@@ -75,8 +78,8 @@ V1Router.post("/deploy", async (req, res) => {
         res.json({ id: project.id });
 
         // Clone the repository
-        const localpath = path.join(__dirname, `../output/${repoName}-${slug}`);
-        simpleGit().clone(githubUrl, localpath);
+        const localpath = path.join(__dirname, `../output/${slug}`);
+        await simpleGit().clone(githubUrl, localpath);
 
         // Update the status and add the log
         await publisher
@@ -87,9 +90,16 @@ V1Router.post("/deploy", async (req, res) => {
             message: "Repository cloned successfully."
         })).exec();
 
-        // Upload to Object Store
-        
-        
+        // List all the files of the repository
+        const files = listAllFiles(localpath);
+
+        // Upload them to Object Store
+        const promiseArray = files.map((file) => uploadFile(file.slice(__dirname.length - 6), file));
+        await Promise.all(promiseArray);
+
+        // Publish the event to redis
+        await publisher.lPush("build-queue", project.id);
+
     } catch (error) {
         console.error("Error in deploying project: ", error)
         res.status(500).json({ message: "Internal server error." });

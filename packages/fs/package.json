@@ -1,0 +1,22 @@
+{
+  "name": "@repo/fs",
+  "version": "1.0.0",
+  "description": "A custom fs module powered by default fs module.",
+  "license": "ISC",
+  "author": "Krishil Jayswal",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsc --watch --preserveWatchOutput",
+    "build": "tsc -b"
+  },
+  "exports": {
+    "." : {
+      "default": "./dist/index.js",
+      "types": "./src/index.ts"
+    }
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*"
+  }
+}
