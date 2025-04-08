@@ -12,17 +12,9 @@ model User {
   email     String    @unique
   name      String
   password  String
-  projects  Project[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-}
-
-enum Status {
-  cloning
-  cloned
-  deploying
-  deployed
-  failed
+  projects  Project[]
 }
 
 model Project {
@@ -31,18 +23,26 @@ model Project {
   github_url String
   status     Status
   userId     String
-  user       User     @relation(references: [id], fields: [userId])
-  slug       String   @unique
-  logs       Log[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  slug       String   @unique
+  logs       Log[]
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 model Log {
   id        String   @id @default(uuid())
   message   String
   projectId String
-  project   Project  @relation(references: [id], fields: [projectId])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id])
+}
+
+enum Status {
+  cloning
+  cloned
+  deploying
+  deployed
+  failed
 }
