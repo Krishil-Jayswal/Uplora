@@ -51,5 +51,4 @@ export const downloadProject = async (prefix: string, localpath: string) => {
   });
 
   await Promise.all(promiseArray);
-  console.log("Downloaded");
 };

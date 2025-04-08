@@ -17,6 +17,7 @@
     "@repo/typescript-config": "*",
     "@repo/redis": "*",
     "@repo/object-store": "*",
+    "@repo/fs": "*",
     "eslint": "^9.24.0",
     "globals": "^16.0.0",
     "nodemon": "^3.1.9",

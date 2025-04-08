@@ -1,6 +1,8 @@
 import { prisma } from "@repo/db";
 import { Request, Response } from "express";
 
+// TODO: Add the Redis layer on top of Database layes for data fetching.
+
 export const getProjects = async (req: Request, res: Response) => {
   try {
     const { id } = req.user!;
