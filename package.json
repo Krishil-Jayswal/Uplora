@@ -25,9 +25,9 @@
     "packages/*"
   ],
   "lint-staged": {
-    "*.{ts, tsx, md}": [
-      "prettier --write",
-      "git add"
+    "*.{ts, tsx, js, jsx, md}": [
+      "npm run lint",
+      "prettier --write"
     ]
   }
 }
