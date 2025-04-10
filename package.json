@@ -4,7 +4,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
+    "lint": "turbo run lint --",
     "format": "lint-staged",
     "check-types": "turbo run check-types",
     "prepare": "husky"
@@ -26,6 +26,7 @@
   ],
   "lint-staged": {
     "*.{ts, tsx, js, jsx, md}": [
+      "npm run lint --",
       "prettier --write"
     ]
   }
