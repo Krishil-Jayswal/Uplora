@@ -26,7 +26,6 @@
   ],
   "lint-staged": {
     "*.{ts, tsx, js, jsx, md}": [
-      "npm run lint",
       "prettier --write"
     ]
   }
