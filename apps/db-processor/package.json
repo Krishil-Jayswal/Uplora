@@ -1,0 +1,27 @@
+{
+  "name": "db-processor",
+  "version": "1.0.0",
+  "description": "A small worker for flushing the data from redis to database.",
+  "license": "ISC",
+  "author": "Krishil Jayswal",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "tsc -b",
+    "start": "node dist/index.js",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "@repo/db": "*",
+    "@repo/redis": "*",
+    "@repo/typescript-config": "*",
+    "@repo/validation": "*",
+    "eslint": "^9.24.0",
+    "globals": "^16.0.0",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript-eslint": "^8.29.1"
+  }
+}

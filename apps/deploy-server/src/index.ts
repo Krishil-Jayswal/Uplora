@@ -31,6 +31,7 @@ class DeployServer {
       const projectId = build?.element as string;
 
       try {
+        // Log for picking up from the build queue and update the status to Deploying
         await publisher
           .multi()
           .hSet(`project:${projectId}`, "status", Status.DEPLOYING)
@@ -49,7 +50,7 @@ class DeployServer {
           "slug",
         )) as string;
 
-        // Download the files from Object Store
+        // Log for downloading the files from Object Store
         await publisher.lPush(
           `logs:${projectId}`,
           JSON.stringify({
@@ -57,7 +58,11 @@ class DeployServer {
             message: "Downloading the files from Object Store ...",
           }),
         );
+
+        // Download the files from Object Store
         await downloadProject(`output/${slug}`, __dirname);
+
+        // Log for downloaded project files successfully
         await publisher.lPush(
           `logs:${projectId}`,
           JSON.stringify({
@@ -66,7 +71,7 @@ class DeployServer {
           }),
         );
 
-        // Build the project
+        // Log for building the project
         publisher.lPush(
           `logs:${projectId}`,
           JSON.stringify({
@@ -74,9 +79,12 @@ class DeployServer {
             message: "Building the project ...",
           }),
         );
+
+        // Build the project
         const projectPath = path.join(__dirname, `output/${slug}`);
         const buildSuccess = await buildProject(projectPath, projectId);
         if (buildSuccess) {
+          // Log for build completed
           await publisher.lPush(
             `logs:${projectId}`,
             JSON.stringify({
@@ -89,7 +97,7 @@ class DeployServer {
           const buildPath = path.join(projectPath, "dist");
           const files = listAllFiles(buildPath);
 
-          // Upload to Object Store
+          // Log for uploading the build files to Object Store
           await publisher.lPush(
             `logs:${projectId}`,
             JSON.stringify({
@@ -97,11 +105,15 @@ class DeployServer {
               message: "Uploading the build files to Object Store ...",
             }),
           );
+
+          // Upload to Object Store
           const promiseArray = files.map((file) => {
             const filename = `dist/${slug}` + file.slice(buildPath.length);
             return uploadFile(filename, file);
           });
           await Promise.all(promiseArray);
+
+          // Log for build files uploaded successfully and update the status to Deployed and publishing the event for flushing the project data
           await publisher
             .multi()
             .lPush(
@@ -119,10 +131,12 @@ class DeployServer {
                 message: "Project deployed successfully!",
               }),
             )
+            .lPush("flush-queue", projectId)
             .exec();
 
           console.log("Project deployed successfully!");
         } else {
+          // Log for build failed and update the status to Failed and publishing the event for flushing the project data
           await publisher
             .multi()
             .lPush(
@@ -133,10 +147,12 @@ class DeployServer {
               }),
             )
             .hSet(`project:${projectId}`, "status", Status.FAILED)
+            .lPush("flush-queue", projectId)
             .exec();
         }
       } catch (error) {
         console.error("Error in deploying project: ", (error as Error).message);
+        // Log for project deployment failed and update the status to Failed and publishing the event for flushing the project data
         await publisher
           .multi()
           .lPush(
@@ -147,6 +163,7 @@ class DeployServer {
             }),
           )
           .hSet(`logs:${projectId}`, "status", Status.FAILED)
+          .lPush("flush-queue", projectId)
           .exec();
       }
     }
