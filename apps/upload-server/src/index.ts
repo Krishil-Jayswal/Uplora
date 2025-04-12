@@ -17,6 +17,8 @@ app.get("/health", (req, res) => {
   res.status(200).json({ message: "Server is running." });
 });
 
+// TODO: Clear the local project folder.
+
 app.use("/api/v1", V1Router);
 
 app.listen(PORT, async (err) => {

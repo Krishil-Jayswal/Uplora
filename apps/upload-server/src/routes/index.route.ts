@@ -74,70 +74,84 @@ V1Router.post("/deploy", async (req, res) => {
       JSON.stringify({
         createdAt: new Date(),
         message: "Cloning the repository ...",
-      })
+      }),
     );
 
     // Sending the Response for polling
     res.json({ id: project.id });
 
-    // Clone the repository
-    const localpath = path.join(__dirname, `../output/${slug}`);
-    await simpleGit().clone(githubUrl, localpath);
+    try {
+      // Clone the repository
+      const localpath = path.join(__dirname, `../output/${slug}`);
+      await simpleGit().clone(githubUrl, localpath);
 
-    // Update the status and add the log
-    await publisher
-      .multi()
-      .hSet(`project:${project.id}`, "status", "cloned")
-      .lPush(
+      // Update the status and add the log
+      await publisher
+        .multi()
+        .hSet(`project:${project.id}`, "status", Status.CLONED)
+        .lPush(
+          `logs:${project.id}`,
+          JSON.stringify({
+            createdAt: new Date(),
+            message: "Repository cloned successfully.",
+          }),
+        )
+        .exec();
+
+      // Log for uploading the files
+      await publisher.lPush(
         `logs:${project.id}`,
         JSON.stringify({
           createdAt: new Date(),
-          message: "Repository cloned successfully.",
-        })
-      )
-      .exec();
+          message: "Uploading files ...",
+        }),
+      );
 
-    // Log for uploading the files
-    await publisher.lPush(
-      `logs:${project.id}`,
-      JSON.stringify({
-        createdAt: new Date(),
-        message: "Uploading files ...",
-      })
-    );
+      // List all the files of the repository
+      const files = listAllFiles(localpath);
 
-    // List all the files of the repository
-    const files = listAllFiles(localpath);
+      // Upload them to Object Store
+      const promiseArray = files.map((file) =>
+        uploadFile(file.slice(__dirname.length - 6), file),
+      );
+      await Promise.all(promiseArray);
 
-    // Upload them to Object Store
-    const promiseArray = files.map((file) =>
-      uploadFile(file.slice(__dirname.length - 6), file)
-    );
-    await Promise.all(promiseArray);
+      // Log for file uploaded successfully
+      await publisher.lPush(
+        `logs:${project.id}`,
+        JSON.stringify({
+          createdAt: new Date(),
+          message: "Files uploaded successfully.",
+        }),
+      );
 
-    // Log for file uploaded successfully
-    await publisher.lPush(
-      `logs:${project.id}`,
-      JSON.stringify({
-        createdAt: new Date(),
-        message: "Files uploaded successfully.",
-      })
-    );
+      // Publish the event to redis
+      await publisher.lPush("build-queue", project.id);
 
-    // Publish the event to redis
-    await publisher.lPush("build-queue", project.id);
-
-    // Log for build queue
-    await publisher.lPush(
-      `logs:${project.id}`,
-      JSON.stringify({
-        createdAt: new Date(),
-        message: "Project queued for build.",
-      })
-    );
+      // Log for build queue
+      await publisher.lPush(
+        `logs:${project.id}`,
+        JSON.stringify({
+          createdAt: new Date(),
+          message: "Project queued for build.",
+        }),
+      );
+    } catch (error) {
+      console.error("Error in deploying project: ", (error as Error).message);
+      await publisher
+        .multi()
+        .lPush(
+          `logs:${project.id}`,
+          JSON.stringify({
+            createdAt: new Date(),
+            message: "Project deployment failed.",
+          }),
+        )
+        .hSet(`project:${project.id}`, "status", Status.FAILED)
+        .exec();
+    }
   } catch (error) {
     console.error("Error in deploying project: ", (error as Error).message);
-    // res.status(500).json({ message: "Internal server error." });
   }
 });
 

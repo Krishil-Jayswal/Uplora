@@ -15,6 +15,7 @@ export const getProjects = async (req: Request, res: Response) => {
         name: true,
         github_url: true,
         status: true,
+        userId: true,
       },
     });
 
