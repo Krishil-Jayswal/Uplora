@@ -23,7 +23,7 @@ export const GithubUrlSchema = z.strictObject({
     .trim()
     .regex(
       /^https:\/\/github\.com\/[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+\.git\/?$/,
-      { message: "Must be a valid github repository url." }
+      { message: "Must be a valid github repository url." },
     )
     .transform((url) => url.replace(/\/+$/, "")),
 });
@@ -50,3 +50,7 @@ export interface Log {
   createdAt: Date;
   message: string;
 }
+
+export type LoginProps = z.infer<typeof LoginSchema>;
+
+export type SignupProps = z.infer<typeof RegisterSchema>;
