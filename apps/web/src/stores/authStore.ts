@@ -16,6 +16,7 @@ interface AuthStore {
   checkAuth: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -78,5 +79,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
     } finally {
       set({ isSigningUp: false });
     }
+  },
+
+  logout: () => {
+    localStorage.removeItem("user-token");
+    set({ User: null });
   },
 }));
