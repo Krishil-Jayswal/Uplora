@@ -13,7 +13,7 @@ const Index = () => {
       <main className="flex-1">
         <Hero />
         <Features />
-        
+
         {/* CTA section */}
         <div className="relative py-24 sm:py-32">
           <div className="absolute inset-0 bg-linear-to-b from-background via-secondary/50 to-background -z-10" />
@@ -26,10 +26,15 @@ const Index = () => {
                 Start deploying your React projects in minutes
               </p>
               <p className="mt-6 text-lg leading-8 text-muted-foreground">
-                Join thousands of developers who trust Uplora for their deployment needs.
+                Join thousands of developers who trust Uplora for their
+                deployment needs.
               </p>
               <div className="mt-10">
-                <Button asChild size="lg" className="group transition-all duration-300 hover:scale-105">
+                <Button
+                  asChild
+                  size="lg"
+                  className="group transition-all duration-300 hover:scale-105"
+                >
                   <Link to="/signup">
                     Get Started Now
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />

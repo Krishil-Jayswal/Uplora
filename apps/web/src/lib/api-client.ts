@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const BACKEND_URL =
   import.meta.env.VITE_MODE === "development"
@@ -16,3 +16,5 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+export const axiosError = AxiosError;

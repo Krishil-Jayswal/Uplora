@@ -1,18 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const { User, logout } = useAuthStore();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
 
   return (
     <nav className="border-b border-border bg-background/95 backdrop-blur-xs supports-backdrop-filter:bg-background/60 sticky top-0 z-50">
@@ -22,9 +16,13 @@ const Navbar = () => {
             <Link to="/" className="flex items-center">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-md bg-linear-to-br from-primary to-accent flex items-center justify-center">
-                  <span className="text-xl font-bold text-primary-foreground">U</span>
+                  <span className="text-xl font-bold text-primary-foreground">
+                    U
+                  </span>
                 </div>
-                <span className="text-2xl font-bold text-foreground">Uplora</span>
+                <span className="text-2xl font-bold text-foreground">
+                  Uplora
+                </span>
               </div>
             </Link>
           </div>
@@ -32,26 +30,42 @@ const Navbar = () => {
             <div className="flex items-center space-x-4">
               {User ? (
                 <>
-                  <Link to="/dashboard" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm">
+                  <Link
+                    to="/dashboard"
+                    className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm"
+                  >
                     Dashboard
                   </Link>
                   <span className="text-muted-foreground px-3 py-2 text-sm">
                     {User?.name}
                   </span>
-                  <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    onClick={logout}
+                    className="flex items-center gap-2"
+                  >
                     <LogOut size={16} />
                     Logout
                   </Button>
                 </>
               ) : (
                 <>
-                  <Link to="/" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm">
+                  <Link
+                    to="/"
+                    className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm"
+                  >
                     Home
                   </Link>
-                  <Link to="/#features" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm">
+                  <Link
+                    to="/#features"
+                    className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm"
+                  >
                     Features
                   </Link>
-                  <Link to="/login" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm">
+                  <Link
+                    to="/login"
+                    className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm"
+                  >
                     Login
                   </Link>
                   <Button asChild>
@@ -77,8 +91,8 @@ const Navbar = () => {
           <div className="space-y-1 px-2 pb-3 pt-2">
             {User ? (
               <>
-                <Link 
-                  to="/dashboard" 
+                <Link
+                  to="/dashboard"
                   className="block text-foreground hover:bg-secondary px-3 py-2 rounded-md text-base font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -89,7 +103,7 @@ const Navbar = () => {
                 </div>
                 <button
                   onClick={() => {
-                    handleLogout();
+                    logout();
                     setIsMenuOpen(false);
                   }}
                   className="w-full text-left block text-muted-foreground hover:bg-secondary hover:text-foreground px-3 py-2 rounded-md text-base font-medium"
@@ -99,29 +113,29 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link 
-                  to="/" 
+                <Link
+                  to="/"
                   className="block text-foreground hover:bg-secondary px-3 py-2 rounded-md text-base font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Home
                 </Link>
-                <Link 
-                  to="/#features" 
+                <Link
+                  to="/#features"
                   className="block text-muted-foreground hover:bg-secondary hover:text-foreground px-3 py-2 rounded-md text-base font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Features
                 </Link>
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   className="block text-muted-foreground hover:bg-secondary hover:text-foreground px-3 py-2 rounded-md text-base font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Login
                 </Link>
-                <Link 
-                  to="/signup" 
+                <Link
+                  to="/signup"
                   className="block text-muted-foreground hover:bg-secondary hover:text-foreground px-3 py-2 rounded-md text-base font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >

@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { api } from "../lib/api-client";
+import { api, axiosError } from "@/lib/api-client";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -44,17 +45,29 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   login: async (email: string, password: string) => {
+    set({ isLoggingIn: true });
     try {
-      set({ isLoggingIn: true });
-      const { data } = await api.post<{ user: User }>("/auth/login", {
-        email,
-        password,
-      });
-
+      const { data } = await api.post<{ user: User; message: string }>(
+        "/auth/login",
+        {
+          email,
+          password,
+        },
+      );
       localStorage.setItem("user-token", data.user.token);
+      toast.success(data.message || "Login successful!", {
+        description: "Redirecting to dashboard...",
+      });
       set({ User: data.user });
     } catch (error) {
       console.error("Error in login: ", error);
+      const message =
+        error instanceof axiosError
+          ? error.response?.data.message
+          : "Login failed.";
+      toast(message, {
+        description: "Please try again later.",
+      });
       localStorage.removeItem("user-token");
       set({ User: null });
     } finally {
@@ -62,18 +75,30 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
   },
   signup: async (name: string, email: string, password: string) => {
+    set({ isSigningUp: true });
     try {
-      set({ isSigningUp: true });
-      const { data } = await api.post<{ user: User }>("/auth/register", {
-        name,
-        email,
-        password,
-      });
-
+      const { data } = await api.post<{ user: User; message: string }>(
+        "/auth/register",
+        {
+          name,
+          email,
+          password,
+        },
+      );
       localStorage.setItem("user-token", data.user.token);
       set({ User: data.user });
+      toast.success(data.message || "Registration successful!", {
+        description: "Redirecting to dashboard...",
+      });
     } catch (error) {
       console.error("Error in signup: ", error);
+      const message =
+        error instanceof axiosError
+          ? error.response?.data.message
+          : "Signup failed.";
+      toast(message, {
+        description: "Please try again later.",
+      });
       localStorage.removeItem("user-token");
       set({ User: null });
     } finally {

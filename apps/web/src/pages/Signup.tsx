@@ -1,58 +1,20 @@
-import { useState } from "react";
-import { useAuthStore } from "../stores/authStore";
-import { SignupProps } from "@repo/validation";
+import Navbar from "../components/Navbar";
+import AuthForm from "../components/AuthForm";
+import Footer from "../components/Footer";
+import { useAuthStore } from "@/stores/authStore";
 
 const Signup = () => {
   const { signup, isSigningUp } = useAuthStore();
-  const [props, setProps] = useState<SignupProps>({
-    name: "",
-    email: "",
-    password: "",
-  });
-  if (isSigningUp) {
-    return <div>Loading ...</div>;
-  }
 
   return (
-    <div>
-      Signup Page
-      <br />
-      <br />
-      <br />
-      <label>Name</label>
-      <br />
-      <input
-        type="text"
-        onChange={(e) => setProps({ ...props, name: e.target.value })}
-      />
-      <br />
-      <br />
-      <br />
-      <label>Email</label>
-      <br />
-      <input
-        type="email"
-        onChange={(e) => setProps({ ...props, email: e.target.value })}
-      />
-      <br />
-      <br />
-      <br />
-      <label>Password</label>
-      <br />
-      <input
-        type="password"
-        onChange={(e) => setProps({ ...props, password: e.target.value })}
-      />
-      <br />
-      <br />
-      <br />
-      <button
-        onClick={() => {
-          signup(props.name, props.email, props.password);
-        }}
-      >
-        Signup
-      </button>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar />
+      <main className="flex flex-1 flex-col items-center justify-center pb-16 pt-16">
+        <div className="w-full max-w-md animate-fade-in">
+          <AuthForm type="signup" onSuccess={signup} isLoading={isSigningUp} />
+        </div>
+      </main>
+      <Footer />
     </div>
   );
 };
