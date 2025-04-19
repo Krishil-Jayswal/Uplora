@@ -12,12 +12,15 @@ dotenv.config({ path: envPath });
 
 const EnvSchema = z.object({
   HTTP_PORT: z.string(),
+  UPLOAD_PORT: z.string(),
+  REQ_HANDLER_PORT: z.string(),
   JWT_SECRET: z.string(),
   MAX_AGE: z.string(),
-  UPLOAD_PORT: z.string(),
   REDIS_URL: z.string(),
   BLOB_CONNECTION_URL: z.string(),
   BLOB_CONTAINER_NAME: z.string(),
+  PROXY_TARGET_URL: z.string(),
+  BLOB_SAS_TOKEN: z.string(),
 });
 
 export const env = EnvSchema.parse(process.env);

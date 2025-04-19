@@ -2,18 +2,24 @@ import { BlobServiceClient } from "@azure/storage-blob";
 import { env } from "@repo/env";
 import fs from "fs";
 import path from "path";
+import mime from "mime";
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(
-  env.BLOB_CONNECTION_URL
+  env.BLOB_CONNECTION_URL,
 );
 const containerClient = blobServiceClient.getContainerClient(
-  env.BLOB_CONTAINER_NAME
+  env.BLOB_CONTAINER_NAME,
 );
 
 export const uploadFile = async (filename: string, filepath: string) => {
   const readStream = fs.createReadStream(filepath);
   const blockBlobClient = containerClient.getBlockBlobClient(filename);
-  await blockBlobClient.uploadStream(readStream);
+  const contentType = mime.getType(filepath) || "application/octet-stream";
+  await blockBlobClient.uploadStream(readStream, undefined, undefined, {
+    blobHTTPHeaders: {
+      blobContentType: contentType,
+    },
+  });
 };
 
 const listBlobs = async (prefix: string) => {

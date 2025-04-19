@@ -12,7 +12,7 @@ export const buildProject = async (projectPath: string, projectId: string) => {
         `logs:${projectId}`,
         JSON.stringify({
           createdAt: new Date(),
-          message: String(data),
+          message: data.toString(),
         }),
       ),
     );
@@ -22,7 +22,7 @@ export const buildProject = async (projectPath: string, projectId: string) => {
         `logs:${projectId}`,
         JSON.stringify({
           createdAt: new Date(),
-          message: String(data),
+          message: data.toString(),
         }),
       ),
     );

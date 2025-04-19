@@ -133,8 +133,6 @@ class DeployServer {
             )
             .lPush("flush-queue", projectId)
             .exec();
-
-          console.log("Project deployed successfully!");
         } else {
           // Log for build failed and update the status to Failed and publishing the event for flushing the project data
           await publisher
