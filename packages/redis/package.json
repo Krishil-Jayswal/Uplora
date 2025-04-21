@@ -17,10 +17,10 @@
     }
   },
   "dependencies": {
-    "redis": "^4.7.0"
+    "ioredis": "^5.6.1"
   },
   "devDependencies": {
-    "@repo/typescript-config": "*",
-    "@repo/env": "*"
+    "@repo/env": "*",
+    "@repo/typescript-config": "*"
   }
 }

@@ -28,7 +28,7 @@ app.listen(PORT, async (err) => {
   }
   await prisma.$connect();
   console.log("Database connected successfully.");
-  await publisher.connect();
+  await new Promise<void>((resolve) => publisher.once("connect", resolve));
   console.log("Redis connected successfully.");
   console.log(`Upload Server is running on port ${PORT}.`);
 });

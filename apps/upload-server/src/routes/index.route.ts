@@ -58,7 +58,7 @@ V1Router.post("/deploy", async (req, res) => {
     });
 
     // Add the project in redis
-    await publisher.hSet(`project:${project.id}`, {
+    await publisher.hset(`project:${project.id}`, {
       id: project.id,
       name: project.name,
       userId: project.userId,
@@ -69,7 +69,7 @@ V1Router.post("/deploy", async (req, res) => {
     });
 
     // Add the log
-    await publisher.lPush(
+    await publisher.lpush(
       `logs:${project.id}`,
       JSON.stringify({
         createdAt: new Date(),
@@ -88,8 +88,8 @@ V1Router.post("/deploy", async (req, res) => {
       // Update the status and add the log
       await publisher
         .multi()
-        .hSet(`project:${project.id}`, "status", Status.CLONED)
-        .lPush(
+        .hset(`project:${project.id}`, "status", Status.CLONED)
+        .lpush(
           `logs:${project.id}`,
           JSON.stringify({
             createdAt: new Date(),
@@ -99,7 +99,7 @@ V1Router.post("/deploy", async (req, res) => {
         .exec();
 
       // Log for uploading the files
-      await publisher.lPush(
+      await publisher.lpush(
         `logs:${project.id}`,
         JSON.stringify({
           createdAt: new Date(),
@@ -117,7 +117,7 @@ V1Router.post("/deploy", async (req, res) => {
       await Promise.all(promiseArray);
 
       // Log for file uploaded successfully
-      await publisher.lPush(
+      await publisher.lpush(
         `logs:${project.id}`,
         JSON.stringify({
           createdAt: new Date(),
@@ -126,10 +126,10 @@ V1Router.post("/deploy", async (req, res) => {
       );
 
       // Publish the event to redis
-      await publisher.lPush("build-queue", project.id);
+      await publisher.lpush("build-queue", project.id);
 
       // Log for build queue
-      await publisher.lPush(
+      await publisher.lpush(
         `logs:${project.id}`,
         JSON.stringify({
           createdAt: new Date(),
@@ -140,14 +140,14 @@ V1Router.post("/deploy", async (req, res) => {
       console.error("Error in deploying project: ", (error as Error).message);
       await publisher
         .multi()
-        .lPush(
+        .lpush(
           `logs:${project.id}`,
           JSON.stringify({
             createdAt: new Date(),
             message: "Project deployment failed.",
           }),
         )
-        .hSet(`project:${project.id}`, "status", Status.FAILED)
+        .hset(`project:${project.id}`, "status", Status.FAILED)
         .exec();
     }
   } catch (error) {

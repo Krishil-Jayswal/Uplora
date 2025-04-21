@@ -8,7 +8,7 @@ export const buildProject = async (projectPath: string, projectId: string) => {
     const child_process = exec(command);
 
     child_process.stdout?.on("data", (data) =>
-      publisher.lPush(
+      publisher.lpush(
         `logs:${projectId}`,
         JSON.stringify({
           createdAt: new Date(),
@@ -18,7 +18,7 @@ export const buildProject = async (projectPath: string, projectId: string) => {
     );
 
     child_process.stderr?.on("data", (data) =>
-      publisher.lPush(
+      publisher.lpush(
         `logs:${projectId}`,
         JSON.stringify({
           createdAt: new Date(),

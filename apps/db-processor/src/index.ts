@@ -18,7 +18,10 @@ class DBProcessor {
 
     // Connect to the Redis
     try {
-      await Promise.all([publisher.connect(), subscriber.connect()]);
+      await Promise.all([
+        new Promise<void>((resolve) => publisher.once("connect", resolve)),
+        new Promise<void>((resolve) => subscriber.once("connect", resolve)),
+      ]);
       console.log("Redis connected successfully.");
     } catch (error) {
       console.error("Error in connecting to Redis: ", (error as Error).message);
@@ -27,15 +30,15 @@ class DBProcessor {
 
     while (true) {
       // Pop the element from the flush queue
-      const flush = await subscriber.brPop("flush-queue", 0);
+      const flush = await subscriber.brpop("flush-queue", 0);
 
       // Get the projectId
-      const projectId = flush?.element as string;
+      const projectId = flush?.[1] as string;
 
       // Get the logs and metadata and store in database
       try {
-        const logs = await subscriber.lRange(`logs:${projectId}`, 0, -1);
-        const project = (await subscriber.hGetAll(
+        const logs = await subscriber.lrange(`logs:${projectId}`, 0, -1);
+        const project = (await subscriber.hgetall(
           `project:${projectId}`,
         )) as unknown as Project;
 
@@ -68,7 +71,7 @@ class DBProcessor {
         );
 
         // Push the event back to the flush queue
-        await publisher.lPush("flush-queue", projectId);
+        await publisher.lpush("flush-queue", projectId);
       }
     }
   }

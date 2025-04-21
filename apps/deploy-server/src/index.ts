@@ -15,7 +15,10 @@ class DeployServer {
   public static async init() {
     // Connect to Redis
     try {
-      await Promise.all([publisher.connect(), subscriber.connect()]);
+      await Promise.all([
+        new Promise<void>((resolve) => publisher.once("connect", resolve)),
+        new Promise<void>((resolve) => subscriber.once("connect", resolve)),
+      ]);
       console.log("Redis connected successfully.");
       console.log("Deploy server started.");
     } catch (error) {
@@ -25,17 +28,17 @@ class DeployServer {
 
     while (true) {
       // Pop the element from the build queue
-      const build = await subscriber.brPop("build-queue", 0);
+      const build = await subscriber.brpop("build-queue", 0);
 
       // Get the projectId
-      const projectId = build?.element as string;
+      const projectId = build?.[1] as string;
 
       try {
         // Log for picking up from the build queue and update the status to Deploying
         await publisher
           .multi()
-          .hSet(`project:${projectId}`, "status", Status.DEPLOYING)
-          .lPush(
+          .hset(`project:${projectId}`, "status", Status.DEPLOYING)
+          .lpush(
             `logs:${projectId}`,
             JSON.stringify({
               createdAt: new Date(),
@@ -45,13 +48,13 @@ class DeployServer {
           .exec();
 
         // Get the slug
-        const slug = (await subscriber.hGet(
+        const slug = (await subscriber.hget(
           `project:${projectId}`,
           "slug",
         )) as string;
 
         // Log for downloading the files from Object Store
-        await publisher.lPush(
+        await publisher.lpush(
           `logs:${projectId}`,
           JSON.stringify({
             createdAt: new Date(),
@@ -63,7 +66,7 @@ class DeployServer {
         await downloadProject(`output/${slug}`, __dirname);
 
         // Log for downloaded project files successfully
-        await publisher.lPush(
+        await publisher.lpush(
           `logs:${projectId}`,
           JSON.stringify({
             createdAt: new Date(),
@@ -72,7 +75,7 @@ class DeployServer {
         );
 
         // Log for building the project
-        publisher.lPush(
+        publisher.lpush(
           `logs:${projectId}`,
           JSON.stringify({
             createdAt: new Date(),
@@ -85,7 +88,7 @@ class DeployServer {
         const buildSuccess = await buildProject(projectPath, projectId);
         if (buildSuccess) {
           // Log for build completed
-          await publisher.lPush(
+          await publisher.lpush(
             `logs:${projectId}`,
             JSON.stringify({
               createdAt: new Date(),
@@ -98,7 +101,7 @@ class DeployServer {
           const files = listAllFiles(buildPath);
 
           // Log for uploading the build files to Object Store
-          await publisher.lPush(
+          await publisher.lpush(
             `logs:${projectId}`,
             JSON.stringify({
               createdAt: new Date(),
@@ -116,36 +119,36 @@ class DeployServer {
           // Log for build files uploaded successfully and update the status to Deployed and publishing the event for flushing the project data
           await publisher
             .multi()
-            .lPush(
+            .lpush(
               `logs:${projectId}`,
               JSON.stringify({
                 createdAt: new Date(),
                 message: "Build files uploaded successfully.",
               }),
             )
-            .hSet(`project:${projectId}`, "status", Status.DEPLOYED)
-            .lPush(
+            .hset(`project:${projectId}`, "status", Status.DEPLOYED)
+            .lpush(
               `logs:${projectId}`,
               JSON.stringify({
                 createdAt: new Date(),
                 message: "Project deployed successfully!",
               }),
             )
-            .lPush("flush-queue", projectId)
+            .lpush("flush-queue", projectId)
             .exec();
         } else {
           // Log for build failed and update the status to Failed and publishing the event for flushing the project data
           await publisher
             .multi()
-            .lPush(
+            .lpush(
               `logs:${projectId}`,
               JSON.stringify({
                 createdAt: new Date(),
                 message: "Build failed.",
               }),
             )
-            .hSet(`project:${projectId}`, "status", Status.FAILED)
-            .lPush("flush-queue", projectId)
+            .hset(`project:${projectId}`, "status", Status.FAILED)
+            .lpush("flush-queue", projectId)
             .exec();
         }
       } catch (error) {
@@ -153,15 +156,15 @@ class DeployServer {
         // Log for project deployment failed and update the status to Failed and publishing the event for flushing the project data
         await publisher
           .multi()
-          .lPush(
+          .lpush(
             `logs:${projectId}`,
             JSON.stringify({
               createdAt: new Date(),
               message: "Project deployment failed.",
             }),
           )
-          .hSet(`logs:${projectId}`, "status", Status.FAILED)
-          .lPush("flush-queue", projectId)
+          .hset(`logs:${projectId}`, "status", Status.FAILED)
+          .lpush("flush-queue", projectId)
           .exec();
       }
     }
