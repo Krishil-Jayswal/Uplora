@@ -6,6 +6,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const { User, logout } = useAuthStore();
 
   return (

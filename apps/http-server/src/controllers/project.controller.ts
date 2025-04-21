@@ -13,9 +13,12 @@ export const getProjects = async (req: Request, res: Response) => {
       select: {
         id: true,
         name: true,
+        slug: true,
         github_url: true,
         status: true,
         userId: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
@@ -44,6 +47,7 @@ export const getProject = async (req: Request, res: Response) => {
         status: true,
         slug: true,
         createdAt: true,
+        updatedAt: true,
         logs: {
           select: {
             message: true,
