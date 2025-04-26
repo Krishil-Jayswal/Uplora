@@ -78,7 +78,7 @@ V1Router.post("/deploy", async (req, res) => {
     );
 
     // Sending the Response for polling
-    res.json({ id: project.id });
+    res.json({ projectId: project.id });
 
     try {
       // Clone the repository

@@ -3,6 +3,7 @@ import { env } from "@repo/env";
 import { prisma } from "@repo/db";
 import V1Router from "./routes/index.route.js";
 import cors from "cors";
+import { subscriber } from "@repo/redis";
 
 const PORT = env.HTTP_PORT;
 
@@ -23,7 +24,11 @@ app.listen(PORT, async (err) => {
     console.error("Error in starting server: ", err);
     process.exit(1);
   }
-  await prisma.$connect();
+  await Promise.all([
+    prisma.$connect(),
+    new Promise((resolve) => subscriber.on("ready", resolve)),
+  ]);
   console.log("Database connected successfully.");
+  console.log("Redis connected successfully.");
   console.log(`HTTP Server is running on port ${PORT}.`);
 });

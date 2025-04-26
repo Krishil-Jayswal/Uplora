@@ -19,8 +19,8 @@ class DBProcessor {
     // Connect to the Redis
     try {
       await Promise.all([
-        new Promise<void>((resolve) => publisher.once("connect", resolve)),
-        new Promise<void>((resolve) => subscriber.once("connect", resolve)),
+        new Promise<void>((resolve) => publisher.on("ready", resolve)),
+        new Promise<void>((resolve) => subscriber.on("ready", resolve)),
       ]);
       console.log("Redis connected successfully.");
     } catch (error) {

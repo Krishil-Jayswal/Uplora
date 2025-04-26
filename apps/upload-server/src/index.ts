@@ -26,9 +26,11 @@ app.listen(PORT, async (err) => {
     console.error("Error in starting server: ", err);
     process.exit(1);
   }
-  await prisma.$connect();
+  await Promise.all([
+    prisma.$connect(),
+    new Promise((resolve) => publisher.on("ready", resolve)),
+  ]);
   console.log("Database connected successfully.");
-  await new Promise<void>((resolve) => publisher.once("connect", resolve));
   console.log("Redis connected successfully.");
   console.log(`Upload Server is running on port ${PORT}.`);
 });
