@@ -1,5 +1,6 @@
 import { exec } from "child_process";
 import { publisher } from "@repo/redis";
+import stripAnsi from "strip-ansi";
 
 export const buildProject = async (projectPath: string, projectId: string) => {
   return new Promise<boolean>((resolve) => {
@@ -7,25 +8,20 @@ export const buildProject = async (projectPath: string, projectId: string) => {
 
     const child_process = exec(command);
 
-    child_process.stdout?.on("data", (data) =>
+    const handleLogs = (data: Buffer) => {
+      const message = stripAnsi(data.toString());
       publisher.lpush(
         `logs:${projectId}`,
         JSON.stringify({
           createdAt: new Date(),
-          message: data.toString(),
+          message,
         }),
-      ),
-    );
+      );
+    };
 
-    child_process.stderr?.on("data", (data) =>
-      publisher.lpush(
-        `logs:${projectId}`,
-        JSON.stringify({
-          createdAt: new Date(),
-          message: data.toString(),
-        }),
-      ),
-    );
+    child_process.stdout?.on("data", handleLogs);
+
+    child_process.stderr?.on("data", handleLogs);
 
     child_process.on("close", (code) => {
       if (code === 0) {
