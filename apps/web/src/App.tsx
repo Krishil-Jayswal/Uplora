@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import NewProject from "./pages/NewProject";
+import ProjectDetail from "./pages/ProjectDetail";
 
 const App = () => {
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -46,12 +48,20 @@ const App = () => {
                 element={!User ? <Login /> : <Navigate to={"/dashboard"} />}
               ></Route>
               <Route
-                path="signup"
+                path="/signup"
                 element={!User ? <Signup /> : <Navigate to={"/dashboard"} />}
               ></Route>
               <Route
                 path="/dashboard"
-                element={!User ? <Navigate to={"/login"} /> : <Dashboard />}
+                element={User ? <Dashboard /> : <Navigate to={"/login"} />}
+              ></Route>
+              <Route
+                path="/new-project"
+                element={User ? <NewProject /> : <Navigate to={"/login"} />}
+              ></Route>
+              <Route
+                path="/project/:projectId"
+                element={User ? <ProjectDetail/> : <Navigate to={"/login"}/>}
               ></Route>
               <Route path="*" element={<NotFound />}></Route>
             </Routes>

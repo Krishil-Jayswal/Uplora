@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { api, axiosError } from "@/lib/api-client";
+import { httpApi, axiosError } from "@/lib/api-client";
 import { toast } from "sonner";
 
 interface User {
@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
         set({ isCheckingAuth: false });
         return;
       }
-      const { data } = await api.get<{ user: User }>("auth/me");
+      const { data } = await httpApi.get<{ user: User }>("/api/v1/auth/me");
 
       set({ User: data.user });
     } catch (error) {
@@ -47,8 +47,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   login: async (email: string, password: string) => {
     set({ isLoggingIn: true });
     try {
-      const { data } = await api.post<{ user: User; message: string }>(
-        "/auth/login",
+      const { data } = await httpApi.post<{ user: User; message: string }>(
+        "/api/v1/auth/login",
         {
           email,
           password,
@@ -78,8 +78,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   signup: async (name: string, email: string, password: string) => {
     set({ isSigningUp: true });
     try {
-      const { data } = await api.post<{ user: User; message: string }>(
-        "/auth/register",
+      const { data } = await httpApi.post<{ user: User; message: string }>(
+        "/api/v1/auth/register",
         {
           name,
           email,

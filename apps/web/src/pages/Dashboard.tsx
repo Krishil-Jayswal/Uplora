@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ProjectCard from "../components/ProjectCard";
 import ProjectCardSkeleton from "../components/ProjectCardSkeleton";
@@ -14,32 +15,27 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search } from "lucide-react";
 import { useProjects } from "../hooks/useProjects";
-import { toast } from "sonner";
 
-type StatusTab =
-  | "all"
-  | "cloning"
-  | "cloned"
-  | "deploying"
-  | "deployed"
-  | "failed";
+type StatusTab = "all" | "cloning" | "cloned" | "deploying" | "deployed" | "failed";
 
+// Map backend status to dashboard/tab status
 function mapStatus(status: string): StatusTab {
   const lookup: Record<string, StatusTab> = {
-    CLONING: "cloning",
-    CLONED: "cloned",
-    DEPLOYING: "deploying",
-    DEPLOYED: "deployed",
-    FAILED: "failed",
+    "cloning": "cloning",
+    "cloned": "cloned",
+    "deploying": "deploying",
+    "deployed": "deployed",
+    "failed": "failed",
   };
-  return lookup[status.toUpperCase()] ?? "all";
+  return lookup[status] ?? "all";
 }
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<StatusTab>("all");
   const { projects, isLoading, error } = useProjects();
-  console.log(projects);
+  const navigate = useNavigate();
+
   let filteredProjects = projects || [];
   if (searchQuery) {
     filteredProjects = filteredProjects.filter((project) =>
@@ -52,14 +48,20 @@ const Dashboard = () => {
     );
   }
 
+  // Handler to safely set the activeTab with the correct type
   const handleTabChange = (value: string) => {
     setActiveTab(value as StatusTab);
   };
 
   const handleNewProject = () => {
-    toast.info("New project feature coming soon!");
+    navigate("/new-project");
   };
 
+  const handleProjectClick = (projectId: string) => {
+    navigate(`/project/${projectId}`);
+  };
+
+  // Skeleton array for loading state
   const skeletonArray = Array(6).fill(0);
 
   return (
@@ -74,7 +76,7 @@ const Dashboard = () => {
                 Deploy and manage your React applications
               </p>
             </div>
-            <Button
+            <Button 
               className="flex items-center group transition-all duration-300 hover:scale-105"
               onClick={handleNewProject}
             >
@@ -83,10 +85,7 @@ const Dashboard = () => {
             </Button>
           </div>
           <div className="flex flex-col space-y-4">
-            <div
-              className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 animate-fade-in"
-              style={{ animationDelay: "100ms" }}
-            >
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 animate-fade-in" style={{ animationDelay: "100ms" }}>
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -97,7 +96,7 @@ const Dashboard = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Tabs
+              <Tabs 
                 defaultValue="all"
                 value={activeTab}
                 onValueChange={handleTabChange}
@@ -114,19 +113,13 @@ const Dashboard = () => {
               </Tabs>
             </div>
             {isLoading ? (
-              <div
-                className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in"
-                style={{ animationDelay: "200ms" }}
-              >
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in" style={{ animationDelay: "200ms" }}>
                 {skeletonArray.map((_, index) => (
                   <ProjectCardSkeleton key={index} />
                 ))}
               </div>
             ) : error ? (
-              <Card
-                className="mt-4 animate-fade-in"
-                style={{ animationDelay: "200ms" }}
-              >
+              <Card className="mt-4 animate-fade-in" style={{ animationDelay: "200ms" }}>
                 <CardHeader>
                   <CardTitle>Error loading projects</CardTitle>
                   <CardDescription>
@@ -137,23 +130,19 @@ const Dashboard = () => {
             ) : filteredProjects.length > 0 ? (
               <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredProjects.map((project, index) => (
-                  <div
-                    key={project.id}
-                    className="animate-fade-in"
+                  <div 
+                    key={project.id} 
+                    className="animate-fade-in cursor-pointer"
                     style={{ animationDelay: `${200 + index * 50}ms` }}
+                    onClick={() => handleProjectClick(project.id)}
                   >
                     <ProjectCard
                       id={project.id}
                       name={project.name}
-                      status={
-                        mapStatus(project.status) === "deployed"
-                          ? "live"
-                          : mapStatus(project.status) === "deploying"
-                            ? "building"
-                            : mapStatus(project.status) === "failed"
-                              ? "failed"
-                              : "building"
-                      }
+                      status={mapStatus(project.status) === "deployed" ? "live"
+                        : mapStatus(project.status) === "deploying" ? "building"
+                        : mapStatus(project.status) === "failed" ? "failed"
+                        : "building"} // fallback to building
                       slug={project.slug}
                       github_url={project.github_url}
                       createdAt={project.createdAt}
@@ -164,10 +153,7 @@ const Dashboard = () => {
                 ))}
               </div>
             ) : (
-              <Card
-                className="mt-4 animate-fade-in"
-                style={{ animationDelay: "200ms" }}
-              >
+              <Card className="mt-4 animate-fade-in" style={{ animationDelay: "200ms" }}>
                 <CardHeader>
                   <CardTitle>No projects found</CardTitle>
                   <CardDescription>
