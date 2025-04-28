@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+}
+
+model Project {
+  id         String   @id @default(uuid())
+  name       String
+  github_url String
+  status     Status
+  userId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  slug       String   @unique
+  logs       Log[]
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  message   String
+  projectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id])
+}
+
+enum Status {
+  cloning
+  cloned
+  deploying
+  deployed
+  failed
+}
