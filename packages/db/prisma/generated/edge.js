@@ -150,7 +150,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "F:\\Development\\Projects\\uplora\\packages\\db\\src\\generated",
+      "value": "F:\\Development\\Projects\\uplora\\packages\\db\\prisma\\generated",
       "fromEnvVar": null
     },
     "config": {
@@ -171,7 +171,7 @@ const config = {
     "rootEnvPath": "../../.env",
     "schemaEnvPath": "../../.env"
   },
-  "relativePath": "../../prisma",
+  "relativePath": "..",
   "clientVersion": "6.6.0",
   "engineVersion": "f676762280b54cd07c770017ed3711ddde35f37a",
   "datasourceNames": [
@@ -187,8 +187,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id        String    @id @default(uuid())\n  email     String    @unique\n  name      String\n  password  String\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n  projects  Project[]\n}\n\nmodel Project {\n  id         String   @id @default(uuid())\n  name       String\n  github_url String\n  status     Status\n  userId     String\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n  slug       String   @unique\n  logs       Log[]\n  user       User     @relation(fields: [userId], references: [id])\n}\n\nmodel Log {\n  id        String   @id @default(uuid())\n  message   String\n  projectId String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  project   Project  @relation(fields: [projectId], references: [id])\n}\n\nenum Status {\n  cloning\n  cloned\n  deploying\n  deployed\n  failed\n}\n",
-  "inlineSchemaHash": "507e9d760ff5dc94f82d3b9eaaa20e20d07ab29a0f47d29877eadaea11000238",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id        String    @id @default(uuid())\n  email     String    @unique\n  name      String\n  password  String\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n  projects  Project[]\n}\n\nmodel Project {\n  id         String   @id @default(uuid())\n  name       String\n  github_url String\n  status     Status\n  userId     String\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n  slug       String   @unique\n  logs       Log[]\n  user       User     @relation(fields: [userId], references: [id])\n}\n\nmodel Log {\n  id        String   @id @default(uuid())\n  message   String\n  projectId String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  project   Project  @relation(fields: [projectId], references: [id])\n}\n\nenum Status {\n  cloning\n  cloned\n  deploying\n  deployed\n  failed\n}\n",
+  "inlineSchemaHash": "9d851aec719f82420a38ddd642eb2a5f42a900eec5fdfbacf328b8fb0823c285",
   "copyEngine": true
 }
 config.dirname = '/'
