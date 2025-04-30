@@ -40,6 +40,4 @@ jobs:
                 username: ${{ secrets.SSH_USERNAME }}
                 key: ${{ secrets.SSH_KEY }}
                 port: ${{ secrets.SSH_PORT }}
-                script: |
-                  bash scripts/init/init-node.sh
-                  node -v
+                script_path: scripts/init/init-node.sh
