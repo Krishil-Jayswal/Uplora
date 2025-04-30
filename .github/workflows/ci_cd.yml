@@ -33,5 +33,13 @@ jobs:
             - name: Build the code
               run: npm run build
 
-            # - name: Deploy the code
-            #   run: npm run deploy
+            - name: Deploy the code
+              uses: appleboy/ssh-action@v1
+              with:
+                host: ${{ secrets.SSH_HOST }}
+                username: ${{ secrets.SSH_USERNAME }}
+                key: ${{ secrets.SSH_KEY }}
+                port: ${{ secrets.SSH_PORT }}
+                script: |
+                  bash scripts/init-node.sh
+                  node -v
