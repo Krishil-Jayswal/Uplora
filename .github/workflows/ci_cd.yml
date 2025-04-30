@@ -9,6 +9,11 @@ jobs:
     build-and-deploy:
         runs-on: ubuntu-latest
         timeout-minutes: 10
+
+        env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN}}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
         steps:
             - name: Checkout the repository
               uses: actions/checkout@v4
@@ -16,7 +21,7 @@ jobs:
             - name: Setup Node.js environment
               uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                  node-version: lts/*
                   cache: 'npm'
 
             - name: Install dependencies
