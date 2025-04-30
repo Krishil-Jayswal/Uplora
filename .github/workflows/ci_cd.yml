@@ -41,5 +41,5 @@ jobs:
                 key: ${{ secrets.SSH_KEY }}
                 port: ${{ secrets.SSH_PORT }}
                 script: |
-                  bash scripts/init-node.sh
+                  bash scripts/init/init-node.sh
                   node -v
