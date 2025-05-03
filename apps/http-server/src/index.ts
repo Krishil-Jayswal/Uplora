@@ -26,7 +26,12 @@ app.listen(PORT, async (err) => {
   }
   await Promise.all([
     prisma.$connect(),
-    new Promise((resolve) => subscriber.on("ready", resolve)),
+    new Promise<void>((resolve) => {
+      if (subscriber.status === "ready") {
+        resolve();
+      }
+      subscriber.on("ready", resolve);
+    }),
   ]);
   console.log("Database connected successfully.");
   console.log("Redis connected successfully.");

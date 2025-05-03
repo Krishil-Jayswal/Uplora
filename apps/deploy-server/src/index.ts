@@ -16,8 +16,18 @@ class DeployServer {
     // Connect to Redis
     try {
       await Promise.all([
-        new Promise((resolve) => publisher.on("ready", resolve)),
-        new Promise((resolve) => subscriber.on("ready", resolve)),
+        new Promise<void>((resolve) => {
+          if (publisher.status === "ready") {
+            resolve();
+          }
+          publisher.on("ready", resolve);
+        }),
+        new Promise<void>((resolve) => {
+          if (subscriber.status === "ready") {
+            resolve();
+          }
+          subscriber.on("ready", resolve);
+        }),
       ]);
       console.log("Redis connected successfully.");
       console.log("Deploy server started.");

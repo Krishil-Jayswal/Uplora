@@ -59,7 +59,10 @@ const ProjectCard = (project: ProjectCardProps) => {
     }
   };
 
-  const deployUrl = `http://${project.slug}.localhost:5002`;
+  const deployUrl =
+    import.meta.env.MODE === "development"
+      ? `http://${project.slug}.localhost:5002`
+      : `https://${project.slug}.uplora-app.metaops.fun`;
 
   const handleDropdownAction = (action: string, e: React.MouseEvent) => {
     e.stopPropagation();

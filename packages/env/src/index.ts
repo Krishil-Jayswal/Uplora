@@ -1,14 +1,12 @@
 import { z } from "zod";
 import { fileURLToPath } from "url";
 import path from "path";
+import dotenv from "dotenv";
 
-if (process.env.NODE_ENV === "development") {
-  const dotenv = await import("dotenv");
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const envPath = path.resolve(__dirname, "../../../.env");
-  dotenv.config({ path: envPath });
-}
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envPath = path.resolve(__dirname, "../../../.env");
+dotenv.config({ path: envPath });
 
 const EnvSchema = z.object({
   HTTP_PORT: z.string().default("Your HTTP Server Port"),

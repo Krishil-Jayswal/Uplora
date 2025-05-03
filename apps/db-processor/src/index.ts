@@ -19,8 +19,18 @@ class DBProcessor {
     // Connect to the Redis
     try {
       await Promise.all([
-        new Promise<void>((resolve) => publisher.on("ready", resolve)),
-        new Promise<void>((resolve) => subscriber.on("ready", resolve)),
+        new Promise<void>((resolve) => {
+          if (publisher.status === "ready") {
+            resolve();
+          }
+          publisher.on("ready", resolve);
+        }),
+        new Promise<void>((resolve) => {
+          if (subscriber.status === "ready") {
+            resolve();
+          }
+          subscriber.on("ready", resolve);
+        }),
       ]);
       console.log("Redis connected successfully.");
     } catch (error) {
@@ -62,8 +72,11 @@ class DBProcessor {
         ]);
 
         // Clear the data from the redis
-        await subscriber.del(`logs:${projectId}`);
-        await subscriber.del(`project:${projectId}`);
+        await subscriber
+          .multi()
+          .del(`logs:${projectId}`)
+          .del(`project:${projectId}`)
+          .exec();
       } catch (error) {
         console.error(
           "Error in processing the event: ",
