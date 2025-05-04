@@ -22,11 +22,11 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "@repo/env": "*"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",
-    "@repo/env": "*",
     "@types/jsonwebtoken": "^9.0.9"
   }
 }

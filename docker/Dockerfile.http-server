@@ -28,9 +28,18 @@ ENV TURBO_TEAM=$TURBO_TEAM
 
 RUN npx turbo build --filter=http-server
 
-RUN npm prune --omit=dev
+# Stage 2 - Prod Installer
+FROM base AS prod-installer
 
-# Stage 2 - Runner
+WORKDIR /app
+
+COPY /out/json/ .
+
+RUN rm -r /app/packages/typescript-config
+
+RUN npm install --omit=dev --ignore-scripts
+
+# Stage 3 - Runner
 FROM base AS runner
 
 WORKDIR /app
@@ -39,10 +48,14 @@ RUN addgroup --system --gid 1001 app-group
 RUN adduser --system --uid 1001 app-user
 USER app-user
 
-COPY --from=builder --chown=app-user:app-group /app/node_modules /app/node_modules
-COPY --chown=app-user:app-group /out/json/ .
+COPY --from=prod-installer --chown=app-user:app-group /app/ /app/
 COPY --from=builder --chown=app-user:app-group /app/apps/http-server/dist /app/apps/http-server/dist
-COPY --from=builder --chown=app-user:app-group /app/packages /app/packages
+COPY --from=builder --chown=app-user:app-group /app/packages/crypto/dist /app/packages/crypto/dist
+COPY --from=builder --chown=app-user:app-group /app/packages/db/dist /app/packages/db/dist
+COPY --from=builder --chown=app-user:app-group /app/packages/db/generated /app/packages/db/generated
+COPY --from=builder --chown=app-user:app-group /app/packages/env/dist /app/packages/env/dist
+COPY --from=builder --chown=app-user:app-group /app/packages/redis/dist /app/packages/redis/dist
+COPY --from=builder --chown=app-user:app-group /app/packages/validation/dist /app/packages/validation/dist
 
 WORKDIR /app/apps/http-server
 
