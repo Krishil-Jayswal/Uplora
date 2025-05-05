@@ -3,13 +3,11 @@ import { downloadProject, uploadFile } from "@repo/object-store";
 import path from "path";
 import { fileURLToPath } from "url";
 import { buildProject } from "./worker.js";
-import { listAllFiles } from "@repo/fs";
+import { clearOutputDir, listAllFiles } from "@repo/fs";
 import { Status } from "@repo/validation";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// TODO: Clear the local project folder.
 
 class DeployServer {
   public static async init() {
@@ -35,6 +33,10 @@ class DeployServer {
       console.error("Error in connecting to redis: ", error);
       process.exit(1);
     }
+
+    setInterval(() => {
+      clearOutputDir(process.cwd());
+    }, 10000);
 
     while (true) {
       // Pop the element from the build queue
