@@ -1,0 +1,59 @@
+# Base Node Image
+FROM node:22-alpine AS base
+
+ARG TURBO_TOKEN
+
+ARG TURBO_TEAM
+
+# Stage 1 - Builder
+FROM base AS builder
+
+RUN apk update
+
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+COPY /out/json/ .
+
+RUN npm install
+
+COPY /out/full/ .
+
+ENV TURBO_TOKEN=$TURBO_TOKEN
+
+ENV TURBO_TEAM=$TURBO_TEAM
+
+RUN npx turbo build --filter=deploy-server
+
+# Stage 2 - Prod Installer
+FROM base AS prod-installer
+
+WORKDIR /app
+
+COPY /out/json/ .
+
+RUN rm -r /app/packages/typescript-config
+
+RUN npm install --omit=dev --ignore-scripts
+
+# Stage 3 - Runner
+FROM base AS runner
+
+WORKDIR /app
+
+RUN addgroup --system --gid 1001 app-group
+RUN adduser --system --uid 1001 app-user
+USER app-user
+
+COPY --from=prod-installer --chown=app-user:app-group /app/ .
+COPY --from=builder --chown=app-user:app-group /app/apps/deploy-server/dist /app/apps/deploy-server/dist
+COPY --from=builder --chown=app-user:app-group /app/packages/env/dist /app/packages/env/dist
+COPY --from=builder --chown=app-user:app-group /app/packages/fs/dist /app/packages/fs/dist
+COPY --from=builder --chown=app-user:app-group /app/packages/object-store/dist /app/packages/object-store/dist
+COPY --from=builder --chown=app-user:app-group /app/packages/redis/dist /app/packages/redis/dist
+COPY --from=builder --chown=app-user:app-group /app/packages/validation/dist /app/packages/validation/dist
+
+WORKDIR /app/apps/deploy-server
+
+CMD [ "npm", "run", "start" ]

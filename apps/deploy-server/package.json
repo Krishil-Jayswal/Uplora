@@ -25,6 +25,7 @@
     "strip-ansi": "^7.1.0",
     "@repo/fs": "*",
     "@repo/object-store": "*",
-    "@repo/redis": "*"
+    "@repo/redis": "*",
+    "@repo/validation": "*"
   }
 }
