@@ -5,9 +5,36 @@ on:
         types: [completed]
 
 jobs:
+    ignore-check:
+        runs-on: ubuntu-latest
+        outputs:
+            code: ${{ steps.check.outputs.code }}
+        steps:
+            - name: Checkout the repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Node.js environment
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: 'npm'
+
+            - name: Run the script
+              id: check
+              run: |
+                chmod 700 ./scripts/ignore-build-check.sh
+
+                ./scripts/ignore-build-check.sh upload-server
+
     build-and-deploy-upload-server:
         runs-on: ubuntu-latest
         timeout-minutes: 10
+        needs: 
+          ignore-check
+        if: ${{ needs.ignore-check.outputs.code !=0 }}
+        
         steps:
             - name: Checkout the repository
               uses: actions/checkout@v4
