@@ -15,8 +15,8 @@ const EnvSchema = z.object({
   JWT_SECRET: z.string().default("Your JWT Secret"),
   MAX_AGE: z.string().default("Your Token Max Age"),
   REDIS_URL: z.string().default("Your Redis URL"),
-  BLOB_CONNECTION_URL: z.string().default("Your Azure Blob Connection URL"),
-  BLOB_CONTAINER_NAME: z.string().default("Your Azure Blob Container Name"),
+  ABS_CONNECTION_URL: z.string().default("Your Azure Blob Connection URL"),
+  ABS_CONTAINER_NAME: z.string().default("Your Azure Blob Container Name"),
   PROXY_TARGET_URL: z.string().default("Your Proxy Target URL"),
   BLOB_SAS_TOKEN: z.string().default("Your Azure Blob SAS Token"),
 });

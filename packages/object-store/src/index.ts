@@ -5,10 +5,10 @@ import path from "path";
 import mime from "mime";
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(
-  env.BLOB_CONNECTION_URL,
+  env.ABS_CONNECTION_URL,
 );
 const containerClient = blobServiceClient.getContainerClient(
-  env.BLOB_CONTAINER_NAME,
+  env.ABS_CONTAINER_NAME,
 );
 
 export const uploadFile = async (filename: string, filepath: string) => {

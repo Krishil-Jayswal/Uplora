@@ -87,4 +87,5 @@ jobs:
                         -e MAX_AGE=${{ secrets.MAX_AGE }} \
                         -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
                         -e REDIS_URL=${{ secrets.REDIS_URL }} \
+                        --restart unless-stopped \
                         ${{ secrets.DOCKERHUB_USERNAME }}/uplora-http-server:${{ github.sha }}
