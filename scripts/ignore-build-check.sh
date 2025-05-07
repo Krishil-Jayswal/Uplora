@@ -16,4 +16,4 @@ set -e
 
 echo "Ignore check exited with exit code $EXIT_CODE"
 
-echo "status_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+echo "code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
