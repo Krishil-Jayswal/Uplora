@@ -57,7 +57,7 @@ jobs:
                         -p ${{ secrets.UPLOAD_PORT }}:${{ secrets.UPLOAD_PORT }} \
                         -e UPLOAD_PORT=${{ secrets.UPLOAD_PORT }} \
                         -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-                        -e ABS_CONNECTION_URL=${{ secrets.ABS_CONNECTION_URL }} \
+                        -e ABS_CONNECTION_URL="${{ secrets.ABS_CONNECTION_URL }}" \
                         -e ABS_CONTAINER_NAME=${{ secrets.ABS_CONTAINER_NAME }} \
                         -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
                         -e REDIS_URL=${{ secrets.REDIS_URL }} \
