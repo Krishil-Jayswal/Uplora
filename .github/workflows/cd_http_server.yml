@@ -1,9 +1,8 @@
 name: Build and Deploy HTTP Server
 on:
     workflow_run: 
-        workflows: ["Lint and Build test's Pipeline"]
-        types: 
-            - completed
+        workflows: ["Lint and Build Pipeline"]
+        types: [completed]
 
 jobs:
     build-and-deploy-http-server:

@@ -1,4 +1,4 @@
-name: Lint and Build test's Pipeline
+name: Lint and Build Pipeline
 
 on: 
     push: 
