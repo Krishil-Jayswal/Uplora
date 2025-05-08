@@ -37,3 +37,7 @@ app.listen(PORT, async (err) => {
   console.log("Redis connected successfully.");
   console.log(`HTTP Server is running on port ${PORT}.`);
 });
+
+setInterval(() => {
+  subscriber.ping().then(console.log);
+}, 30000);

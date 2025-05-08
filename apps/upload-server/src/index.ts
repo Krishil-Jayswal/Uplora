@@ -5,6 +5,8 @@ import { prisma } from "@repo/db";
 import V1Router from "./routes/index.route.js";
 import { publisher } from "@repo/redis";
 import { clearOutputDir } from "@repo/fs";
+import { fileURLToPath } from "url";
+import path from "path";
 
 const PORT = env.UPLOAD_PORT;
 
@@ -39,6 +41,13 @@ app.listen(PORT, async (err) => {
   console.log(`Upload Server is running on port ${PORT}.`);
 });
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 setInterval(() => {
-  clearOutputDir(process.cwd());
+  clearOutputDir(__dirname, 5);
 }, 10000);
+
+setInterval(() => {
+  publisher.ping().then(console.log);
+}, 30000);

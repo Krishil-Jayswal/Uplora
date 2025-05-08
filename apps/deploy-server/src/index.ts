@@ -35,8 +35,13 @@ class DeployServer {
     }
 
     setInterval(() => {
-      clearOutputDir(process.cwd());
+      clearOutputDir(__dirname, 10);
     }, 10000);
+
+    setInterval(() => {
+      publisher.ping().then(console.log);
+      subscriber.ping().then(console.log);
+    }, 30000);
 
     while (true) {
       // Pop the element from the build queue

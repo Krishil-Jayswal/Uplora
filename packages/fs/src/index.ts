@@ -17,7 +17,7 @@ export const listAllFiles = (dirname: string) => {
   return files;
 };
 
-export const clearOutputDir = (rootDir: string) => {
+export const clearOutputDir = (rootDir: string, thresholdAge: number) => {
   const outputDir = path.join(rootDir, "output");
   if (!fs.existsSync(outputDir)) {
     return;
@@ -36,8 +36,8 @@ export const clearOutputDir = (rootDir: string) => {
         );
       }
       const ageOfContent =
-        ((Date.now() - stats.birthtime.getTime()) / 1000) * 60;
-      if (ageOfContent > 10) {
+        (Date.now() - stats.birthtime.getTime()) / (1000 * 60);
+      if (ageOfContent > thresholdAge) {
         fs.rm(fullContentPath, { recursive: true, force: true }, (err) => {
           if (err) {
             console.error(
