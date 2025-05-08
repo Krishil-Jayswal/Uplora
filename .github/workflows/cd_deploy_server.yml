@@ -1,0 +1,61 @@
+name: Build and Deploy Deploy Server
+on:
+    workflow_run: 
+        workflows: ["Lint and Build Pipeline"]
+        types: [completed]
+
+jobs:
+    build-and-deploy-http-server:
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Checkout the repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Node.js environment
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: 'npm'
+
+            - name: Prune the codebase for Deploy Server
+              run: npx turbo prune deploy-server --docker
+
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Build and Push the Docker image
+              uses: docker/build-push-action@v6
+              with:
+                context: .
+                file: ./docker/Dockerfile.deploy-server
+                build-args: |
+                    TURBO_TOKEN=${{ secrets.TURBO_TOKEN}}
+                    TURBO_TEAM=${{ vars.TURBO_TEAM }}
+                push: true
+                tags: ${{ secrets.DOCKERHUB_USERNAME }}/uplora-deploy-server:${{ github.sha }}
+
+            - name: Start the Docker container
+              uses: appleboy/ssh-action@v1
+              with:
+                  host: ${{ secrets.SSH_HOST }}
+                  username: ${{ secrets.SSH_USERNAME }}
+                  key: ${{ secrets.SSH_KEY }}
+                  script: |
+                      docker pull ${{ secrets.DOCKERHUB_USERNAME }}/uplora-deploy-server:${{ github.sha }}
+
+                      docker stop uplora-deploy-server || true
+                      docker rm uplora-deploy-server || true
+                      
+                      docker run -d \
+                        --name uplora-deploy-server \
+                        -e ABS_CONNECTION_URL="${{ secrets.ABS_CONNECTION_URL }}" \
+                        -e ABS_CONTAINER_NAME=${{ secrets.ABS_CONTAINER_NAME }} \
+                        -e REDIS_URL=${{ secrets.REDIS_URL }} \
+                        --restart unless-stopped \
+                        ${{ secrets.DOCKERHUB_USERNAME }}/uplora-http-server:${{ github.sha }}

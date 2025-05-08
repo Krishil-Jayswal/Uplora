@@ -40,7 +40,6 @@ class DeployServer {
 
     setInterval(() => {
       publisher.ping().then(console.log);
-      subscriber.ping().then(console.log);
     }, 30000);
 
     while (true) {
@@ -92,7 +91,7 @@ class DeployServer {
         );
 
         // Log for building the project
-        publisher.lpush(
+        await publisher.lpush(
           `logs:${projectId}`,
           JSON.stringify({
             createdAt: new Date(),
