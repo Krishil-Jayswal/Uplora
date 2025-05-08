@@ -58,4 +58,4 @@ jobs:
                         -e ABS_CONTAINER_NAME=${{ secrets.ABS_CONTAINER_NAME }} \
                         -e REDIS_URL=${{ secrets.REDIS_URL }} \
                         --restart unless-stopped \
-                        ${{ secrets.DOCKERHUB_USERNAME }}/uplora-http-server:${{ github.sha }}
+                        ${{ secrets.DOCKERHUB_USERNAME }}/uplora-deploy-server:${{ github.sha }}
