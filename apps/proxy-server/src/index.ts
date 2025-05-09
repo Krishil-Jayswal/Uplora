@@ -3,7 +3,7 @@ import httpProxy from "http-proxy";
 import { env } from "@repo/env";
 import path from "path";
 
-const PORT = env.REQ_HANDLER_PORT;
+const PORT = env.PROXY_PORT;
 const BASE_URL = env.PROXY_TARGET_URL;
 
 const proxy = httpProxy.createProxy();
@@ -16,7 +16,7 @@ app.use((req, res) => {
   const filename = req.path === "/" ? "index.html" : req.path.slice(1);
   const extension = path.extname(filename).toLowerCase();
   const resolvedFilename = extension ? filename : "index.html";
-  const fullPath = `/${slug}/${resolvedFilename}?${env.BLOB_SAS_TOKEN}`;
+  const fullPath = `/${slug}/${resolvedFilename}?${env.ABS_SAS_TOKEN}`;
 
   // Rewrite the path with SAS Token
   req.url = fullPath;

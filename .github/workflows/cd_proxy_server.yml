@@ -81,8 +81,8 @@ jobs:
                       
                       docker run -d \
                         --name uplora-proxy-server \
-                        -p ${{ secrets.REQ_HANDLER_PORT }}:${{ secrets.REQ_HANDLER_PORT }} \
-                        -e REQ_HANDLER_PORT=${{ secrets.REQ_HANDLER_PORT }} \
+                        -p ${{ secrets.PROXY_PORT }}:${{ secrets.PROXY_PORT }} \
+                        -e PROXY_PORT=${{ secrets.PROXY_PORT }} \
                         -e PROXY_TARGET_URL=${{ secrets.PROXY_TARGET_URL }} \
                         -e ABS_SAS_TOKEN="${{ secrets.ABS_SAS_TOKEN }}" \
                         --restart unless-stopped \
