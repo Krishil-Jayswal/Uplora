@@ -38,12 +38,23 @@ class DBProcessor {
       process.exit(1);
     }
 
+    // Ping the publisher client
+    setInterval(() => {
+      publisher.ping().then(console.log);
+    });
+
     while (true) {
       // Pop the element from the flush queue
-      const flush = await subscriber.brpop("flush-queue", 0);
+      const flush = await subscriber.brpop("flush-queue", 150);
 
       // Get the projectId
-      const projectId = flush?.[1] as string;
+      const projectId = flush?.[1];
+
+      // Continue if the projectId is not available
+      if (!projectId) {
+        console.warn("Empty project Id.");
+        continue;
+      }
 
       // Get the logs and metadata and store in database
       try {

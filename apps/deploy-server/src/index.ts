@@ -62,7 +62,7 @@ class DeployServer {
 
   private static async pollBuildQueue() {
     try {
-      const build = await subscriber.brpop("build-queue", 0);
+      const build = await subscriber.brpop("build-queue", 150);
       const projectId = build?.[1];
 
       if (!projectId) {

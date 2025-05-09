@@ -27,7 +27,6 @@ app.use((req, res) => {
     changeOrigin: true,
     selfHandleResponse: false,
     secure: true,
-    proxyTimeout: 5000,
     followRedirects: true,
   });
 });
