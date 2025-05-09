@@ -41,7 +41,7 @@ class DBProcessor {
     // Ping the publisher client
     setInterval(() => {
       publisher.ping().then(console.log);
-    });
+    }, 30000);
 
     while (true) {
       // Pop the element from the flush queue
