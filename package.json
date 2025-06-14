@@ -9,7 +9,8 @@
     "check-types": "turbo run check-types",
     "prepare": "husky",
     "db:generate": "cd packages/db && prisma generate",
-    "db:migrate": "cd packages/db && prisma migrate dev"
+    "db:migrate": "cd packages/db && prisma migrate dev",
+    "db:reset": "cd packages/db && prisma migrate reset"
   },
   "devDependencies": {
     "husky": "^9.1.7",
