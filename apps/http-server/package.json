@@ -25,13 +25,12 @@
     "typescript-eslint": "^8.29.0"
   },
   "dependencies": {
-    "@octokit/core": "^7.0.2",
+    "@octokit/app": "^16.0.1",
     "@repo/crypto": "*",
     "@repo/db": "*",
     "@repo/env": "*",
     "@repo/redis": "*",
     "@repo/validation": "*",
-    "axios": "^1.10.0",
     "cors": "^2.8.5",
     "express": "^5.1.0"
   }

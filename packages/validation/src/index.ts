@@ -28,6 +28,17 @@ export const GithubUrlSchema = z.strictObject({
     .transform((url) => url.replace(/\/+$/, "")),
 });
 
+export const GithubOAuthSchema = z.strictObject({
+  code: z.string(),
+  state: z.string(),
+});
+
+export const GithubInstallationSchema = z.strictObject({
+  installation_id: z.string(),
+  setup_action: z.enum(["install", "update"]),
+  state: z.string(),
+});
+
 export enum Status {
   CLONING = "cloning",
   CLONED = "cloned",

@@ -15,14 +15,15 @@ const EnvSchema = z.object({
   JWT_SECRET: z.string().default("Your JWT Secret"),
   MAX_AGE: z.string().default("Your Token Max Age"),
   REDIS_URL: z.string().default("Your Redis URL"),
+  CLIENT_URL: z.string().default("Your client url."),
   ABS_CONNECTION_URL: z.string().default("Your Azure Blob Connection URL"),
   ABS_CONTAINER_NAME: z.string().default("Your Azure Blob Container Name"),
   PROXY_TARGET_URL: z.string().default("Your Proxy Target URL"),
   ABS_SAS_TOKEN: z.string().default("Your Azure Blob SAS Token"),
-  GITHUB_CLIENT_ID: z.string().default("Your github oauth app client Id."),
-  GITHUB_CLIENT_SECRET: z
-    .string()
-    .default("Your github oauth app client secret."),
+  GITHUB_APP_ID: z.string().default("Yout github app id."),
+  GITHUB_PRIVATE_KEY: z.string().default("Your gihub app private key."),
+  GITHUB_CLIENT_ID: z.string().default("Your github app client Id."),
+  GITHUB_CLIENT_SECRET: z.string().default("Your github app client secret."),
 });
 
 export const env = EnvSchema.parse(process.env);
