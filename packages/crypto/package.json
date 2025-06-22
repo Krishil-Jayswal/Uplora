@@ -11,6 +11,10 @@
     "build": "tsc -b"
   },
   "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./src/index.ts"
+    },
     "./bcrypt": {
       "default": "./dist/bcrypt/index.js",
       "types": "./src/bcrypt/index.ts"

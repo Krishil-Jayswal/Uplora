@@ -36,6 +36,10 @@ export enum Status {
   FAILED = "failed",
 }
 
+export enum Oauth_Type {
+  GITHUB = "GITHUB",
+}
+
 export interface Project {
   id: string;
   name: string;

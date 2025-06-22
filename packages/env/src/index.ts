@@ -19,6 +19,10 @@ const EnvSchema = z.object({
   ABS_CONTAINER_NAME: z.string().default("Your Azure Blob Container Name"),
   PROXY_TARGET_URL: z.string().default("Your Proxy Target URL"),
   ABS_SAS_TOKEN: z.string().default("Your Azure Blob SAS Token"),
+  GITHUB_CLIENT_ID: z.string().default("Your github oauth app client Id."),
+  GITHUB_CLIENT_SECRET: z
+    .string()
+    .default("Your github oauth app client secret."),
 });
 
 export const env = EnvSchema.parse(process.env);

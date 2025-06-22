@@ -1,105 +1,85 @@
 import { Request, Response } from "express";
-import { LoginSchema, RegisterSchema } from "@repo/validation";
+import { Oauth_Type } from "@repo/validation";
 import { prisma } from "@repo/db";
-import { compare, hash } from "@repo/crypto/bcrypt";
-import { createToken } from "@repo/crypto/jwt";
+import { createToken, getRandomBytes } from "@repo/crypto";
+import { env } from "@repo/env";
+import { publisher, keymanager } from "@repo/redis";
+import axios from "axios";
+import { Octokit } from "@octokit/core";
 
-export const register = async (req: Request, res: Response) => {
+export const githubAuth = async (req: Request, res: Response) => {
   try {
-    // Input Data Validation
-    const validation = RegisterSchema.safeParse(req.body);
-    if (!validation.success) {
-      res.status(400).json({ message: "Invalid data format." });
-      return;
-    }
-
-    const { name, email, password } = validation.data;
-
-    // Email Uniqueness check
-    const emailExist = await prisma.user.findFirst({
-      where: {
-        email,
-      },
-    });
-    if (emailExist) {
-      res.status(400).json({ message: "Email already registered." });
-      return;
-    }
-
-    // Hashing Password
-    const hashedPassword = hash(password);
-
-    // Registering User
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-      },
-    });
-
-    // Creating the JWT Token
-    const token = createToken({ id: user.id });
-
-    // Sending the Response
-    res.status(201).json({
-      message: "Account created successfully.",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        token,
-      },
-    });
+    const state = getRandomBytes();
+    const satetKey = keymanager.getOauthStateKey(state);
+    await publisher.setex(satetKey, 60 * 10, "YES");
+    const redirectUrl = `https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}&scope=read:user%20user:email&state=${state}`;
+    res.redirect(redirectUrl);
   } catch (error) {
-    console.error("Error in registering user: ", error);
+    console.error("Error in github auth: ", (error as Error).message);
     res.status(500).json({ message: "Internal server error." });
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const githubCallback = async (req: Request, res: Response) => {
   try {
-    // Input Data Validation
-    const validation = LoginSchema.safeParse(req.body);
-    if (!validation.success) {
-      res.status(400).json({ message: "Invalid data format." });
+    const { code, state } = req.query;
+    if (!code || !state) {
+      res.status(400).json({ message: "Missing query params." });
       return;
     }
 
-    // Finding the user
-    const { email, password } = validation.data;
-    const user = await prisma.user.findFirst({
+    const statetKey = keymanager.getOauthStateKey(state.toString());
+    const exists = await publisher.getdel(statetKey);
+
+    if (!exists) {
+      res.status(400).json({ message: "State not matched." });
+      return;
+    }
+
+    const response = await axios.get(
+      `https://github.com/login/oauth/access_token?client_id=${env.GITHUB_CLIENT_ID}&client_secret=${env.GITHUB_CLIENT_SECRET}&code=${code}`,
+      {
+        headers: {
+          Accept: "application/json",
+        },
+      },
+    );
+
+    const octokit = new Octokit({
+      auth: response.data.access_token,
+    });
+
+    const { data: profile } = await octokit.request("GET /user");
+    const { data: emails } = await octokit.request("GET /user/emails");
+    const primaryAndVerifiedEmails = emails.filter(
+      (email) => email.primary && email.verified,
+    );
+    const email = primaryAndVerifiedEmails[0]!.email;
+
+    let user = await prisma.user.findFirst({
       where: {
-        email,
+        oauth_id: profile.id.toString(),
+        oauth_type: Oauth_Type.GITHUB,
       },
     });
+    console.log(user);
     if (!user) {
-      res.status(400).json({ message: "Invalid email or password." });
-      return;
+      user = await prisma.user.create({
+        data: {
+          oauth_id: profile.id.toString(),
+          oauth_type: Oauth_Type.GITHUB,
+          name: profile.name || profile.login,
+          email,
+          avatar_url: profile.avatar_url,
+        },
+      });
     }
 
-    //Matching the password
-    const isPasswordMatch = compare(password, user.password);
-    if (!isPasswordMatch) {
-      res.status(400).json({ message: "Invalid email or password." });
-      return;
-    }
-
-    // Creating the JWT Token
     const token = createToken({ id: user.id });
 
-    // Sending the Response
-    res.status(200).json({
-      message: "Logged in successfully.",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        token,
-      },
-    });
+    res.redirect(`http://localhost:5173/callback?token=${token}`);
   } catch (error) {
-    console.error("Error in logging user: ", error);
+    console.error("Error in github callback: ", (error as Error).message);
     res.status(500).json({ message: "Internal server error." });
   }
 };

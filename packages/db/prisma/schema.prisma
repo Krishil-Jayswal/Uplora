@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output = "../generated"
+  output   = "../generated"
 }
 
 datasource db {
@@ -9,13 +9,15 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String
-  password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  projects  Project[]
+  id         String     @id @default(uuid())
+  oauth_id   String     @unique
+  oauth_type Oauth_Type
+  name       String
+  email      String     @unique
+  avatar_url String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  projects   Project[]
 }
 
 model Project {
@@ -46,4 +48,8 @@ enum Status {
   deploying
   deployed
   failed
+}
+
+enum Oauth_Type {
+  GITHUB
 }

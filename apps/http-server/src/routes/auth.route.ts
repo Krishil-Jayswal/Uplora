@@ -1,12 +1,16 @@
 import express from "express";
-import { login, me, register } from "../controllers/auth.controller.js";
+import {
+  githubCallback,
+  githubAuth,
+  me,
+} from "../controllers/auth.controller.js";
 import { authMiddlware } from "../middlewares/auth.middleware.js";
 
 const authRouter = express.Router();
 
-authRouter.post("/register", register);
+authRouter.get("/github", githubAuth);
 
-authRouter.post("/login", login);
+authRouter.get("/github/callback", githubCallback);
 
 authRouter.get("/me", authMiddlware, me);
 
