@@ -39,6 +39,10 @@ export const GithubInstallationSchema = z.strictObject({
   state: z.string(),
 });
 
+export const CreateProjectConfigSchema = z.object({
+  fullname: z.string(),
+});
+
 export enum Status {
   CLONING = "cloning",
   CLONED = "cloned",

@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { prisma } from "@repo/db";
 import { getRandomBytes } from "@repo/crypto";
 import { publisher, keymanager } from "@repo/redis";
 import { githubApp } from "../config/github.js";
@@ -22,19 +21,11 @@ export const githubAuth = async (req: Request, res: Response) => {
 
 export const me = async (req: Request, res: Response) => {
   try {
-    const payload = req.user!;
-    const { id, token } = payload;
-    const user = await prisma.user.findFirst({
-      where: {
-        id,
-      },
-    });
+    const user = req.user!;
     res.status(200).json({
       user: {
-        id: user?.id,
-        name: user?.name,
-        email: user?.email,
-        token,
+        ...user,
+        installation_id: user.installation_id ? "YES" : undefined,
       },
     });
   } catch (error) {
