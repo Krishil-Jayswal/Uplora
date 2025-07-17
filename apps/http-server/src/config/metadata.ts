@@ -4,12 +4,12 @@ export const defaultMetadata = {
   buildandoutputSettings: {
     dependencyInstallationCommand: "npm install",
     buildCommand: "npm run build",
-    outDir: "/dist",
+    outDir: "dist",
   },
   environmentVariables: [
     {
-      variablename: "SECRET_VARIABLE_1",
-      variablevalue: "SECRET_VALUE_1",
+      variablename: "",
+      variablevalue: "",
     },
   ],
 };

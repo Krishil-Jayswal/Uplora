@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { githubApp } from "../config/github.js";
 import { env } from "@repo/env";
 import { keymanager, publisher } from "@repo/redis";
-import { GithubInstallationSchema } from "@repo/validation";
+import { GithubInstallationCallbackSchema } from "@repo/validation";
 import { prisma } from "@repo/db";
 
 export const appInstallationHandler = async (req: Request, res: Response) => {
@@ -10,8 +10,8 @@ export const appInstallationHandler = async (req: Request, res: Response) => {
     const { id } = req.user!;
     const stateKey = keymanager.getInstallationStateKey(id);
     await publisher.setex(stateKey, 60 * 10, "YES");
-    const install_url = await githubApp.getInstallationUrl({ state: id });
-    res.status(200).json({ install_url });
+    const installUrl = await githubApp.getInstallationUrl({ state: id });
+    res.status(200).json({ installUrl });
   } catch (error) {
     console.error(
       "Error in github app installation: ",
@@ -21,11 +21,14 @@ export const appInstallationHandler = async (req: Request, res: Response) => {
   }
 };
 
-export const callbackHandler = async (req: Request, res: Response) => {
+export const installationCallbackHandler = async (
+  req: Request,
+  res: Response,
+) => {
   try {
-    const validation = GithubInstallationSchema.safeParse(req.query);
+    const validation = GithubInstallationCallbackSchema.safeParse(req.query);
     if (!validation.success) {
-      res.status(400).json({ message: "Missing query params." });
+      res.redirect(`${env.CLIENT_URL}/callback`);
       return;
     }
     const { state, setup_action, installation_id } = validation.data;
@@ -35,25 +38,26 @@ export const callbackHandler = async (req: Request, res: Response) => {
           id: state,
         },
         data: {
-          installation_id,
+          installationId: installation_id,
         },
       });
     }
+
     res.redirect(`${env.CLIENT_URL}/dashboard`);
   } catch (error) {
     console.error(
       "Error in github installation callback: ",
       (error as Error).message,
     );
-    res.status(500).json({ message: "Internal server error." });
+    res.redirect(`${env.CLIENT_URL}/callback`);
   }
 };
 
 export const getRepos = async (req: Request, res: Response) => {
   try {
-    const { installation_id } = req.user!;
+    const { installationId } = req.user!;
     const octokit = await githubApp.getInstallationOctokit(
-      Number(installation_id),
+      Number(installationId),
     );
     const { data } = await octokit.request("GET /installation/repositories");
     const repos = data.repositories
