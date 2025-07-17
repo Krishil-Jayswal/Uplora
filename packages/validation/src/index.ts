@@ -11,11 +11,27 @@ export const GithubInstallationCallbackSchema = z.strictObject({
   state: z.string(),
 });
 
-export const ConfigureProjectSchema = z.object({
-  fullname: z.string(),
+const ProjectMetadata = z.object({
+  framework: z.enum(["Vite"]),
+  rootDir: z.string().trim(),
+  dependencyInstallationCommand: z.enum(["npm install"]),
+  buildCommand: z.enum(["npm run build"]),
+  outDir: z.string().trim(),
+  environmentVariables: z.array(
+    z.strictObject({
+      variablename: z.string().trim(),
+      variablevalue: z.string().trim(),
+    }),
+  ),
 });
 
-export const FullnameSchema = z.tuple([z.string(), z.string()]);
+export const DeployProjectSchema = z.strictObject({
+  repoFullName: z.string().trim(),
+  name: z.string().trim(),
+  metadata: ProjectMetadata,
+});
+
+export const RepoFullnameSchema = z.tuple([z.string(), z.string()]);
 
 export enum Status {
   CLONING = "cloning",

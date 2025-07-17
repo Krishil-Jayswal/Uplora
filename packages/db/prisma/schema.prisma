@@ -27,11 +27,14 @@ model Project {
   id       String @id @default(uuid())
   name     String
   repoUrl  String
+  repoId   String
   status   Status
   ownerId  String
   slug     String @unique
   metadata String
   owner    User   @relation(fields: [ownerId], references: [id])
+
+  @@index([repoId])
 }
 
 enum Status {

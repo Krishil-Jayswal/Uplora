@@ -81,7 +81,7 @@ export const me = async (req: Request, res: Response) => {
     res.status(200).json({
       user: {
         ...user,
-        installationId: user.installationId ? "YES" : undefined,
+        installation: user.installationId ? true : false,
       },
     });
   } catch (error) {

@@ -28,8 +28,8 @@ const MAX_SLUG_LENGTH = 25;
 
 const sanitize = (word: string) => word.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-const generateBaseSlug = (reponame: string) => {
-  const words = reponame.split(/\s+/).map(sanitize).filter(Boolean);
+const generateBaseSlug = (projectName: string) => {
+  const words = projectName.split(/\s+/).map(sanitize).filter(Boolean);
   let slug = words.join("-");
   slug = slug.slice(0, MAX_SLUG_LENGTH);
   return slug.replace(/-+$/g, "");
@@ -49,9 +49,9 @@ const checkSlugExists = async (slug: string) => {
   return exists ? true : false;
 };
 
-export const generateSlug = async (reponame: string) => {
+export const generateSlug = async (projectName: string) => {
   try {
-    const baseSlug = generateBaseSlug(reponame);
+    const baseSlug = generateBaseSlug(projectName);
     let finalSlug = baseSlug;
 
     if (await checkSlugExists(finalSlug)) {
