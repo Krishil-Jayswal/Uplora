@@ -34,6 +34,7 @@ export const DeployProjectSchema = z.strictObject({
 export const RepoFullnameSchema = z.tuple([z.string(), z.string()]);
 
 export enum Status {
+  QUEUED = "queued",
   CLONING = "cloning",
   BUILDING = "building",
   DEPLOYED = "deployed",
@@ -44,3 +45,12 @@ export enum Oauth_Type {
   GITHUB = "GITHUB",
   GOOGLE = "GOOGLE",
 }
+
+export type Job = {
+  id: string;
+  name: string;
+  repoUrl: string;
+  installationId: string;
+  slug: string;
+  metadata: z.infer<typeof ProjectMetadata>;
+};

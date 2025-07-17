@@ -17,6 +17,7 @@ const EnvSchema = z.object({
   MAX_AGE: z.string().default("Token Max Age"),
 
   REDIS_URL: z.string().default("Redis URL"),
+  KAFKA_URL: z.string().default("Kafka cluster url"),
   DATABASE_URL: z.string().default("Database Url"),
   ABS_CONNECTION_URL: z.string().default("Azure Blob Connection URL"),
   ABS_CONTAINER_NAME: z.string().default("Azure Blob Container Name"),

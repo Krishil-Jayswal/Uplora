@@ -1,0 +1,26 @@
+{
+  "name": "@repo/kafka",
+  "version": "1.0.0",
+  "description": "A package for sharing kafka producers and workers.",
+  "license": "ISC",
+  "author": "Krishil Jayswal",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsc --watch --preserveWatchOutput",
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@repo/env": "*",
+    "kafkajs": "^2.2.4"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*"
+  }
+}

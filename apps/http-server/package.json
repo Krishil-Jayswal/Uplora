@@ -29,6 +29,7 @@
     "@repo/jwt": "*",
     "@repo/db": "*",
     "@repo/env": "*",
+    "@repo/kafka": "*",
     "@repo/redis": "*",
     "@repo/validation": "*",
     "cors": "^2.8.5",

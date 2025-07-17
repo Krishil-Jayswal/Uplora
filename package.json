@@ -10,7 +10,8 @@
     "prepare": "husky",
     "db:generate": "cd packages/db && prisma generate",
     "db:migrate": "cd packages/db && prisma migrate dev",
-    "db:reset": "cd packages/db && prisma migrate reset"
+    "db:reset": "cd packages/db && prisma migrate reset",
+    "kafka:migrate": "cd packages/kafka && node ./dist/migration.js"
   },
   "devDependencies": {
     "husky": "^9.1.7",

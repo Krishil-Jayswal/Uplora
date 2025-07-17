@@ -1,5 +1,6 @@
 import {
   DeployProjectSchema,
+  Job,
   RepoFullnameSchema,
   Status,
 } from "@repo/validation";
@@ -7,6 +8,7 @@ import { Request, Response } from "express";
 import { githubApp } from "../config/github.js";
 import { prisma } from "@repo/db";
 import { generateSlug } from "../lib/slug.js";
+import { producer, Topic } from "@repo/kafka";
 
 export const deployProject = async (req: Request, res: Response) => {
   try {
@@ -40,11 +42,23 @@ export const deployProject = async (req: Request, res: Response) => {
         repoUrl: data.clone_url,
         slug,
         metadata: JSON.stringify(metadata),
-        status: Status.CLONING,
+        status: Status.QUEUED,
       },
     });
 
-    // TODO: Send deployment job to kafka
+    const Job: Job = {
+      id: project.id,
+      name: project.name,
+      repoUrl: project.repoUrl,
+      slug,
+      installationId: installationId!,
+      metadata,
+    };
+
+    await producer.send({
+      topic: Topic.JOB,
+      messages: [{ value: JSON.stringify(Job), key: project.id }],
+    });
 
     res.status(201).json({ id: project.id });
   } catch (error) {

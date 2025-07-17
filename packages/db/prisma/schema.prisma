@@ -38,6 +38,7 @@ model Project {
 }
 
 enum Status {
+  queued
   cloning
   building
   deployed
