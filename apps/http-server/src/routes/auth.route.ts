@@ -9,7 +9,7 @@ import { authMiddlware } from "../middlewares/auth.middleware.js";
 const authRouter = express.Router();
 
 authRouter.get("/github", githubAuth);
-authRouter.use("/callback/github", githubAuthCallback);
+authRouter.get("/callback/github", githubAuthCallback);
 authRouter.get("/me", authMiddlware, me);
 
 export default authRouter;

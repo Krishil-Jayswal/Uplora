@@ -6,8 +6,8 @@ export const installMiddleware = async (
   next: NextFunction,
 ) => {
   try {
-    const { installation_id } = req.user!;
-    if (!installation_id) {
+    const { installationId } = req.user!;
+    if (!installationId) {
       res.status(200).json({ message: "Connect github to continue." });
       return;
     }

@@ -1,4 +1,4 @@
-import { verifyToken } from "@repo/crypto/jwt";
+import { verifyToken } from "@repo/jwt";
 import { prisma } from "@repo/db";
 import { Request, Response, NextFunction } from "express";
 
@@ -29,8 +29,8 @@ export const authMiddlware = async (
       id: user.id,
       name: user.name,
       email: user.email,
-      avatar_url: user.avatar_url,
-      installation_id: user.installation_id,
+      avatarUrl: user.avatarUrl,
+      installationId: user.installationId,
       token,
     };
     next();
