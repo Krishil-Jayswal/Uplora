@@ -8,7 +8,8 @@ import { Request, Response } from "express";
 import { githubApp } from "../config/github.js";
 import { prisma } from "@repo/db";
 import { generateSlug } from "../lib/slug.js";
-import { producer, Topic } from "@repo/kafka";
+import { producer } from "@repo/kafka/producer";
+import { Topic } from "@repo/kafka/meta";
 
 export const deployProject = async (req: Request, res: Response) => {
   try {
@@ -57,7 +58,7 @@ export const deployProject = async (req: Request, res: Response) => {
 
     await producer.send({
       topic: Topic.JOB,
-      messages: [{ value: JSON.stringify(Job), key: project.id }],
+      messages: [{ value: JSON.stringify(Job), key: id }],
     });
 
     res.status(201).json({ id: project.id });

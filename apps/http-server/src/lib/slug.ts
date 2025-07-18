@@ -36,7 +36,7 @@ const generateBaseSlug = (projectName: string) => {
 };
 
 const generateRandomSuffix = () => {
-  String(randomInt(10000)).padStart(4, "0");
+  return String(randomInt(10000)).padStart(4, "0");
 };
 
 const checkSlugExists = async (slug: string) => {

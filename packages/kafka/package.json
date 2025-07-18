@@ -7,9 +7,17 @@
   "type": "module",
   "main": "dist/index.js",
   "exports": {
-    ".": {
-      "default": "./dist/index.js",
-      "types": "./src/index.ts"
+    "./producer": {
+      "default": "./dist/producer.js",
+      "types": "./src/producer.ts"
+    },
+    "./consumer": {
+      "default": "./dist/consumer.js",
+      "types": "./src/consumer.ts"
+    },
+    "./meta": {
+      "default": "./dist/meta.js",
+      "types": "./src/meta.ts"
     }
   },
   "scripts": {

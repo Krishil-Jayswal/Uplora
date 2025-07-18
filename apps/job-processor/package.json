@@ -1,0 +1,21 @@
+{
+  "name": "job-processor",
+  "version": "1.0.0",
+  "description": "A consumer for managing deployment jobs.",
+  "license": "ISC",
+  "author": "Krishil Jayswal",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon --config ../../packages/nodemon-config/nodemon.json",
+    "build": "tsc -b",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@repo/kafka": "*",
+    "@repo/validation": "*"
+  },
+  "devDependencies": {
+    "@repo/nodemon-config": "*",
+    "@repo/typescript-config": "*"
+  }
+}

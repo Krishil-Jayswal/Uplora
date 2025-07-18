@@ -1,11 +1,6 @@
-import { Kafka, ITopicConfig } from "kafkajs";
-import { CLIENT_ID, Topic } from "./types.js";
-import { env } from "@repo/env";
-
-const kafka = new Kafka({
-  clientId: CLIENT_ID,
-  brokers: [env.KAFKA_URL],
-});
+import { ITopicConfig } from "kafkajs";
+import { kafka } from "./index.js";
+import { Topic } from "./meta.js";
 
 const admin = kafka.admin();
 
