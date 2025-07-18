@@ -1,0 +1,16 @@
+{
+  "name": "@repo/nodemon-config",
+  "version": "1.0.0",
+  "description": "A shared config for nodemon.",
+  "license": "ISC",
+  "author": "Krishil Jayswal",
+  "type": "module",
+  "exports": {
+    "./register": "./register.js",
+    "./nodemon": "./nodemon.json"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2"
+  }
+}
