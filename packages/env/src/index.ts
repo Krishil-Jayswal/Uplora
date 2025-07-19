@@ -32,6 +32,8 @@ const EnvSchema = z.object({
   GITHUB_PRIVATE_KEY: z.string().default("Gihub app private key."),
   GITHUB_CLIENT_ID: z.string().default("Github app client Id."),
   GITHUB_CLIENT_SECRET: z.string().default("Github app client secret."),
+
+  JOB_JSON_BASE64: z.string().default(""),
 });
 
 export const env = EnvSchema.parse(process.env);

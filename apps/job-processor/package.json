@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@repo/nodemon-config": "*",
-    "@repo/typescript-config": "*"
+    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "*"
   }
 }

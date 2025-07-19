@@ -10,6 +10,9 @@ class JobProcessor {
       eachMessage: async ({ message }) => {
         const Job: Job = JSON.parse(message.value?.toString() || "{}");
         console.log(JSON.stringify(Job, null, 2));
+        console.log(
+          Buffer.from(JSON.stringify(Job), "utf8").toString("base64"),
+        );
       },
     });
   }

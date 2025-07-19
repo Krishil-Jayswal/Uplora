@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { preprocess, z } from "zod";
 
 export const OAuthCallbackSchema = z.strictObject({
   code: z.string(),
@@ -11,11 +11,20 @@ export const GithubInstallationCallbackSchema = z.strictObject({
   state: z.string(),
 });
 
-const ProjectMetadata = z.object({
-  framework: z.enum(["Vite"]),
+const ProjectMetadata = z.strictObject({
+  framework: z.preprocess(
+    (val) => (typeof val === "string" ? val.trim() : val),
+    z.enum(["Vite"]),
+  ),
   rootDir: z.string().trim(),
-  dependencyInstallationCommand: z.enum(["npm install"]),
-  buildCommand: z.enum(["npm run build"]),
+  dependencyInstallationCommand: z.preprocess(
+    (val) => (typeof val === "string" ? val.trim() : val),
+    z.enum(["npm install"]),
+  ),
+  buildCommand: z.preprocess(
+    (val) => (typeof val === "string" ? val.trim() : val),
+    z.enum(["npm run build"]),
+  ),
   outDir: z.string().trim(),
   environmentVariables: z.array(
     z.strictObject({
