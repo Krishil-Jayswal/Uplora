@@ -1,5 +1,5 @@
 {
-  "name": "job-processor",
+  "name": "processor",
   "version": "1.0.0",
   "description": "A consumer for managing deployment jobs.",
   "license": "ISC",

@@ -46,6 +46,7 @@ export enum Status {
   QUEUED = "queued",
   CLONING = "cloning",
   BUILDING = "building",
+  DEPLOYING = "deploying",
   DEPLOYED = "deployed",
   FAILED = "failed",
 }
@@ -62,4 +63,20 @@ export type Job = {
   installationId: string;
   slug: string;
   metadata: z.infer<typeof ProjectMetadata>;
+};
+
+export enum Event_Type {
+  STATUS = "STATUS",
+  LOG = "LOG",
+}
+
+export type Job_Event = {
+  type: Event_Type;
+  content: string;
+  timestamp: Date;
+};
+
+export type Log = {
+  content: string;
+  timestamp: Date;
 };

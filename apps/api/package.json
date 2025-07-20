@@ -1,5 +1,5 @@
 {
-  "name": "http-server",
+  "name": "api",
   "version": "1.0.0",
   "description": "A http server for handling user data.",
   "license": "ISC",

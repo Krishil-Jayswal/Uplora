@@ -1,5 +1,5 @@
 {
-  "name": "job-worker",
+  "name": "worker",
   "version": "1.0.0",
   "description": "A worker for doing the deployment job.",
   "license": "ISC",
@@ -20,6 +20,7 @@
     "@azure/storage-blob": "^12.27.0",
     "@octokit/auth-app": "^8.0.2",
     "@repo/env": "*",
+    "@repo/kafka": "*",
     "@repo/redis": "*",
     "@repo/validation": "*",
     "mime": "^4.0.7",

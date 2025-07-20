@@ -11,9 +11,17 @@
     "build": "tsc -b"
   },
   "exports": {
-    ".": {
-      "default": "./dist/index.js",
-      "types": "./src/index.ts"
+    "./publisher": {
+      "default": "./dist/publisher.js",
+      "types": "./src/publisher.ts"
+    },
+    "./subscriber": {
+      "default": "./dist/subscriber.js",
+      "types": "./src/subscriber.ts"
+    },
+    "./managers": {
+      "default": "./dist/managers/index.js",
+      "types": "./src/managers/index.ts"
     }
   },
   "dependencies": {

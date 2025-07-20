@@ -4,14 +4,15 @@
     3. Clone the repo -> Done
     4. Make the shell command string -> Done
     5. Spwan a process and Build the repo -> Done
-    6. Upload build to S3 -> Done
-    7. Push all the logs to queue
-    8. Update the project status time to time
+    6. Upload build to object store -> Done
+    7. Push all the logs to list and publish to their corresponding channel -> Done
+    8. Update the project status time to time -> Done
+    9. Emit the event to pusher in kafka -> Done
 */
 
 import { createAppAuth } from "@octokit/auth-app";
 import { env } from "@repo/env";
-import { Job } from "@repo/validation";
+import { Event_Type, Job, Job_Event, Log, Status } from "@repo/validation";
 import { simpleGit } from "simple-git";
 import path from "node:path";
 import { exec, execSync } from "node:child_process";
@@ -19,25 +20,59 @@ import stripAnsi from "strip-ansi";
 import { BlobServiceClient } from "@azure/storage-blob";
 import fs from "fs";
 import mime from "mime";
+import { publisher } from "@repo/redis/publisher";
+import { keymanager } from "@repo/redis/managers";
+import { producer } from "@repo/kafka/producer";
+import { Topic } from "@repo/kafka/meta";
 
 class Worker {
   public static async run() {
-    try {
-      const {
-        slug,
-        installationId,
-        repoUrl,
-        metadata: {
-          rootDir,
-          dependencyInstallationCommand,
-          buildCommand,
-          outDir,
-          environmentVariables,
-        },
-      }: Job = JSON.parse(
-        Buffer.from(env.JOB_JSON_BASE64, "base64").toString("utf8"),
-      );
+    const {
+      id,
+      slug,
+      installationId,
+      repoUrl,
+      metadata: {
+        rootDir,
+        dependencyInstallationCommand,
+        buildCommand,
+        outDir,
+        environmentVariables,
+      },
+    }: Job = JSON.parse(
+      Buffer.from(env.JOB_JSON_BASE64, "base64").toString("utf8"),
+    );
 
+    const statusKey = keymanager.getStatusKey(id);
+    const logsKey = keymanager.getLogsKey(id);
+    const channelKey = keymanager.getChannelKey(id);
+
+    const publishEvent = async (type: Event_Type, content: string) => {
+      const event: Job_Event = {
+        type,
+        content: content.trim(),
+        timestamp: new Date(),
+      };
+      const multi = publisher.multi();
+      switch (type) {
+        case Event_Type.LOG: {
+          const log: Log = {
+            content: event.content,
+            timestamp: event.timestamp,
+          };
+          multi.lpush(logsKey, JSON.stringify(log));
+          break;
+        }
+        case Event_Type.STATUS: {
+          multi.set(statusKey, content);
+        }
+      }
+      multi.publish(channelKey, JSON.stringify(event));
+
+      await multi.exec();
+    };
+
+    try {
       const auth = createAppAuth({
         appId: env.GITHUB_APP_ID,
         privateKey: env.GITHUB_PRIVATE_KEY,
@@ -55,8 +90,12 @@ class Worker {
         `https://x-access-token:${token}@`,
       );
 
-      console.log("Cloning the repo...");
+      publishEvent(Event_Type.STATUS, Status.CLONING);
+
+      console.log("Cloning the repo...\n");
+      publishEvent(Event_Type.LOG, "Cloning the repo...");
       await simpleGit().clone(signedRepoUrl, projectBasePath);
+
       const projectRootPath = path.join(projectBasePath, rootDir);
       const commands = [
         `cd ${projectRootPath}`,
@@ -71,6 +110,8 @@ class Worker {
         envVars[variable.variablename] = variable.variablename;
       });
 
+      publishEvent(Event_Type.STATUS, Status.BUILDING);
+
       const buildSuccess = await new Promise<boolean>((resolve) => {
         const p = exec(commands, {
           env: envVars,
@@ -79,6 +120,7 @@ class Worker {
         const handlestdout = (data: Buffer) => {
           const message = stripAnsi(data.toString());
           console.log(message);
+          publishEvent(Event_Type.LOG, message);
         };
 
         p.stdout?.on("data", handlestdout);
@@ -119,7 +161,7 @@ class Worker {
         .trim();
       const buildFiles = fs
         .readdirSync(projectBuildPath, { recursive: true })
-        .filter((f) => f !== "." && f !== "..");
+        .filter((file) => file !== "." && file !== "..");
 
       await Promise.all(
         buildFiles.map((file) => {
@@ -132,9 +174,42 @@ class Worker {
         }),
       );
 
-      console.log(`Build : ${buildId} successful.`);
+      publishEvent(Event_Type.STATUS, Status.DEPLOYING);
+      publishEvent(Event_Type.LOG, "Build successful.");
+
+      await producer.send({
+        topic: Topic.STORE_LOGS,
+        messages: [
+          {
+            value: Buffer.from(
+              JSON.stringify({ id, buildId }),
+              "utf8",
+            ).toString("base64"),
+            key: id,
+          },
+        ],
+      });
     } catch (error) {
       console.error("Error in wokrer: ", (error as Error).message);
+
+      publishEvent(Event_Type.STATUS, Status.FAILED);
+      publishEvent(Event_Type.LOG, "Build failed.");
+
+      await producer.send({
+        topic: Topic.STORE_LOGS,
+        messages: [
+          {
+            value: Buffer.from(
+              JSON.stringify({ id, buildId: "-1" }),
+              "utf8",
+            ).toString("base64"),
+            key: id,
+          },
+        ],
+      });
+    } finally {
+      publisher.quit();
+      producer.disconnect();
     }
   }
 }

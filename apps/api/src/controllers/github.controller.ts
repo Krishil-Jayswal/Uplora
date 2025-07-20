@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { githubApp } from "../config/github.js";
 import { env } from "@repo/env";
-import { keymanager, publisher } from "@repo/redis";
+import { publisher } from "@repo/redis/publisher";
+import { keymanager } from "@repo/redis/managers";
 import { GithubInstallationCallbackSchema } from "@repo/validation";
 import { prisma } from "@repo/db";
 

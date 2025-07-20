@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { publisher, keymanager } from "@repo/redis";
+import { publisher } from "@repo/redis/publisher";
+import { keymanager } from "@repo/redis/managers";
 import { githubApp } from "../config/github.js";
 import { randomBytes } from "node:crypto";
 import { Oauth_Type, OAuthCallbackSchema } from "@repo/validation";
