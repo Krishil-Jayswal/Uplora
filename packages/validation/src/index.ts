@@ -1,4 +1,4 @@
-import { preprocess, z } from "zod";
+import { z } from "zod";
 
 export const OAuthCallbackSchema = z.strictObject({
   code: z.string(),
@@ -79,4 +79,9 @@ export type Job_Event = {
 export type Log = {
   content: string;
   timestamp: Date;
+};
+
+export type Pusher_Event = {
+  id: string;
+  buildId: string;
 };

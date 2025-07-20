@@ -24,6 +24,7 @@ import { publisher } from "@repo/redis/publisher";
 import { keymanager } from "@repo/redis/managers";
 import { producer } from "@repo/kafka/producer";
 import { Topic } from "@repo/kafka/meta";
+import { randomBytes } from "node:crypto";
 
 class Worker {
   public static async run() {
@@ -46,6 +47,8 @@ class Worker {
     const statusKey = keymanager.getStatusKey(id);
     const logsKey = keymanager.getLogsKey(id);
     const channelKey = keymanager.getChannelKey(id);
+
+    let buildId = randomBytes(20).toString("hex");
 
     const publishEvent = async (type: Event_Type, content: string) => {
       const event: Job_Event = {
@@ -96,6 +99,10 @@ class Worker {
       publishEvent(Event_Type.LOG, "Cloning the repo...");
       await simpleGit().clone(signedRepoUrl, projectBasePath);
 
+      buildId = execSync("git rev-parse HEAD", { cwd: projectBasePath })
+        .toString()
+        .trim();
+
       const projectRootPath = path.join(projectBasePath, rootDir);
       const commands = [
         `cd ${projectRootPath}`,
@@ -107,7 +114,7 @@ class Worker {
 
       const envVars: Record<string, string> = {};
       environmentVariables.forEach((variable) => {
-        envVars[variable.variablename] = variable.variablename;
+        envVars[variable.variablename] = variable.variablevalue;
       });
 
       publishEvent(Event_Type.STATUS, Status.BUILDING);
@@ -132,7 +139,7 @@ class Worker {
         });
       });
 
-      if (!buildSuccess) throw Error("Build failed");
+      if (!buildSuccess) throw new Error("Build failed");
 
       const blobServiceClient = BlobServiceClient.fromConnectionString(
         env.ABS_CONNECTION_URL,
@@ -156,9 +163,7 @@ class Worker {
       };
 
       const projectBuildPath = path.join(projectRootPath, outDir);
-      const buildId = execSync("git rev-parse HEAD", { cwd: projectBasePath })
-        .toString()
-        .trim();
+
       const buildFiles = fs
         .readdirSync(projectBuildPath, { recursive: true })
         .filter((file) => file !== "." && file !== "..");
@@ -174,8 +179,8 @@ class Worker {
         }),
       );
 
-      publishEvent(Event_Type.STATUS, Status.DEPLOYING);
       publishEvent(Event_Type.LOG, "Build successful.");
+      publishEvent(Event_Type.STATUS, Status.DEPLOYING);
 
       await producer.send({
         topic: Topic.STORE_LOGS,
@@ -190,17 +195,17 @@ class Worker {
         ],
       });
     } catch (error) {
-      console.error("Error in wokrer: ", (error as Error).message);
+      console.error("Error in worker: ", (error as Error).message);
 
-      publishEvent(Event_Type.STATUS, Status.FAILED);
       publishEvent(Event_Type.LOG, "Build failed.");
+      publishEvent(Event_Type.STATUS, Status.FAILED);
 
       await producer.send({
         topic: Topic.STORE_LOGS,
         messages: [
           {
             value: Buffer.from(
-              JSON.stringify({ id, buildId: "-1" }),
+              JSON.stringify({ id, buildId }),
               "utf8",
             ).toString("base64"),
             key: id,
