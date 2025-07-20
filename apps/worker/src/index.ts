@@ -166,19 +166,24 @@ class Worker {
 
       const buildFiles = fs
         .readdirSync(projectBuildPath, { recursive: true })
-        .filter((file) => file !== "." && file !== "..");
+        .filter(
+          (file) =>
+            !fs
+              .statSync(path.join(projectBuildPath, file.toString()))
+              .isDirectory() &&
+            file !== "." &&
+            file !== "..",
+        );
 
       await Promise.all(
         buildFiles.map((file) => {
           const filepath = path.join(projectBuildPath, file.toString());
           const filename = path.join(slug, buildId, file.toString());
-          if (fs.statSync(filepath).isDirectory()) {
-            return;
-          }
           return uploadFile(filename, filepath);
         }),
       );
 
+      console.log("Build successful.");
       publishEvent(Event_Type.LOG, "Build successful.");
       publishEvent(Event_Type.STATUS, Status.DEPLOYING);
 
@@ -186,10 +191,7 @@ class Worker {
         topic: Topic.STORE_LOGS,
         messages: [
           {
-            value: Buffer.from(
-              JSON.stringify({ id, buildId }),
-              "utf8",
-            ).toString("base64"),
+            value: JSON.stringify({ id, buildId }),
             key: id,
           },
         ],
@@ -204,10 +206,7 @@ class Worker {
         topic: Topic.STORE_LOGS,
         messages: [
           {
-            value: Buffer.from(
-              JSON.stringify({ id, buildId }),
-              "utf8",
-            ).toString("base64"),
+            value: JSON.stringify({ id, buildId }),
             key: id,
           },
         ],

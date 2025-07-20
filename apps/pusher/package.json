@@ -1,0 +1,25 @@
+{
+  "name": "pusher",
+  "version": "1.0.0",
+  "description": "A small worker for flushing the data from redis to database.",
+  "license": "ISC",
+  "author": "Krishil Jayswal",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "nodemon --config ../../packages/nodemon-config/nodemon.json",
+    "build": "tsc -b",
+    "start": "node dist/index.js",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@repo/nodemon-config": "*",
+    "@repo/eslint-config": "*"
+  },
+  "dependencies": {
+    "@repo/db": "*",
+    "@repo/redis": "*",
+    "@repo/kafka": "*"
+  }
+}
