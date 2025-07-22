@@ -9,20 +9,22 @@ const envPath = path.join(__dirname, "../../../.env");
 dotenv.config({ path: envPath });
 
 const EnvSchema = z.object({
-  HTTP_PORT: z.string().default("HTTP Server Port"),
-  UPLOAD_PORT: z.string().default("Upload Server Port"),
-  PROXY_PORT: z.string().default("Proxy Server Port"),
+  APP_ENV: z.enum(["development", "production"]),
+
+  PORT: z.string().default("API Server Port"),
 
   JWT_SECRET: z.string().default("JWT Secret"),
   MAX_AGE: z.string().default("Token Max Age"),
 
   REDIS_URL: z.string().default("Redis URL"),
-  KAFKA_URL: z.string().default("Kafka cluster url"),
+
   DATABASE_URL: z.string().default("Database Url"),
+
   ABS_CONNECTION_URL: z.string().default("Azure Blob Connection URL"),
   ABS_CONTAINER_NAME: z.string().default("Azure Blob Container Name"),
-  PROXY_TARGET_URL: z.string().default("Proxy Target URL"),
   ABS_SAS_TOKEN: z.string().default("Azure Blob SAS Token"),
+
+  PROXY_TARGET_URL: z.string().default("Proxy Target URL"),
 
   CLIENT_URL: z.string().default("Client url."),
 
@@ -34,6 +36,11 @@ const EnvSchema = z.object({
   GITHUB_CLIENT_SECRET: z.string().default("Github app client secret."),
 
   JOB_JSON_BASE64: z.string().default(""),
+
+  KAFKA_URL: z.string().default("Kafka cluster Url"),
+  KAFKA_USERNAME: z.string().default("Kafka cluster username"),
+  KAFKA_PASSWORD: z.string().default("Kafka cluster password"),
+  KAFKA_CA_CERT: z.string().default("Kafka cluster ca certificate"),
 });
 
 export const env = EnvSchema.parse(process.env);

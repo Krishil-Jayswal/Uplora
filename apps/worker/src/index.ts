@@ -121,7 +121,10 @@ class Worker {
 
       const buildSuccess = await new Promise<boolean>((resolve) => {
         const p = exec(commands, {
-          env: envVars,
+          env: {
+            ...process.env,
+            ...envVars,
+          },
         });
 
         const handlestdout = (data: Buffer) => {
@@ -183,8 +186,8 @@ class Worker {
         }),
       );
 
-      console.log("Build successful.");
-      publishEvent(Event_Type.LOG, "Build successful.");
+      console.log("Build successful...\n");
+      publishEvent(Event_Type.LOG, "Build successful...");
       publishEvent(Event_Type.STATUS, Status.DEPLOYING);
 
       await producer.send({
