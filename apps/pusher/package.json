@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "@repo/db": "*",
+    "@repo/kafka": "*",
     "@repo/redis": "*",
-    "@repo/kafka": "*"
+    "@repo/validation": "*"
   }
 }
