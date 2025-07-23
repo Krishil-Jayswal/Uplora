@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@kubernetes/client-node": "^1.3.0",
+    "@repo/env": "*",
     "@repo/kafka": "*",
     "@repo/validation": "*"
   },
