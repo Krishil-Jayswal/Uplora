@@ -11,7 +11,7 @@ RUN apk update
 
 WORKDIR /app
 
-COPY /out/json/ .
+COPY /out/json .
 
 RUN npm install
 
@@ -46,7 +46,7 @@ RUN addgroup --system --gid 1001 app-group
 RUN adduser --system --uid 1001 app-user
 USER app-user
 
-COPY --from=installer --chown=app-user:app-group /app/ .
+COPY --from=installer --chown=app-user:app-group /app .
 COPY --from=builder --chown=app-user:app-group /app/apps/worker/dist /app/apps/worker/dist
 COPY --from=builder --chown=app-user:app-group /app/packages/env/dist /app/packages/env/dist
 COPY --from=builder --chown=app-user:app-group /app/packages/kafka/dist /app/packages/kafka/dist

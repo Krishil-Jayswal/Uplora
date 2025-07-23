@@ -21,9 +21,9 @@
   },
   "dependencies": {
     "@octokit/app": "^16.0.1",
-    "@repo/jwt": "*",
     "@repo/db": "*",
     "@repo/env": "*",
+    "@repo/jwt": "*",
     "@repo/kafka": "*",
     "@repo/redis": "*",
     "@repo/validation": "*",
