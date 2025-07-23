@@ -4,7 +4,7 @@ import V1Router from "./routes/index.route.js";
 import cors from "cors";
 import { prisma } from "@repo/db";
 
-const PORT = env.PORT;
+const PORT = env.API_PORT;
 
 const app = express();
 

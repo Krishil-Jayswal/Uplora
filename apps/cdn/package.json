@@ -1,5 +1,5 @@
 {
-  "name": "proxy-server",
+  "name": "cdn",
   "version": "1.0.0",
   "description": "A proxy server for handling dynamic path requests.",
   "license": "ISC",
@@ -7,23 +7,20 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon",
+    "dev": "nodemon --config ../../packages/nodemon-config/nodemon.json",
     "build": "tsc -b",
     "start": "node dist/index.js",
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@eslint/js": "^9.25.0",
+    "@repo/eslint-config": "*",
+    "@repo/nodemon-config": "*",
     "@repo/typescript-config": "*",
     "@types/express": "^5.0.1",
-    "@types/http-proxy": "^1.17.16",
-    "eslint": "^9.25.0",
-    "globals": "^16.0.0",
-    "nodemon": "^3.1.9",
-    "ts-node": "^10.9.2",
-    "typescript-eslint": "^8.30.1"
+    "@types/http-proxy": "^1.17.16"
   },
   "dependencies": {
+    "@repo/db": "*",
     "@repo/env": "*",
     "express": "^5.1.0",
     "http-proxy": "^1.18.1"

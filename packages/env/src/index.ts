@@ -11,7 +11,8 @@ dotenv.config({ path: envPath });
 const EnvSchema = z.object({
   APP_ENV: z.enum(["development", "production"]),
 
-  PORT: z.string().default("API Server Port"),
+  API_PORT: z.string().default("API Server Port"),
+  CDN_PORT: z.string().default("CDN Server Port"),
 
   JWT_SECRET: z.string().default("JWT Secret"),
   MAX_AGE: z.string().default("Token Max Age"),
