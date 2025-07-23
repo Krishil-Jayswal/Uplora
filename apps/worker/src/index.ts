@@ -194,7 +194,7 @@ class Worker {
         topic: Topic.STORE_LOGS,
         messages: [
           {
-            value: JSON.stringify({ id, buildId }),
+            value: JSON.stringify({ id, buildId, status: Status.DEPLOYING }),
             key: id,
           },
         ],
@@ -209,7 +209,7 @@ class Worker {
         topic: Topic.STORE_LOGS,
         messages: [
           {
-            value: JSON.stringify({ id, buildId }),
+            value: JSON.stringify({ id, buildId, status: Status.FAILED }),
             key: id,
           },
         ],

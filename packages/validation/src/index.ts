@@ -84,4 +84,5 @@ export type Log = {
 export type Pusher_Event = {
   id: string;
   buildId: string;
+  status: Status;
 };
