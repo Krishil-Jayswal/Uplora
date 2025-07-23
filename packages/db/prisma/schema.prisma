@@ -18,29 +18,60 @@ model User {
   installationId String?
   projects       Project[]
   createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  updatedAt      DateTime   @default(now()) @updatedAt
 
   @@unique([oauthType, oauthId])
 }
 
 model Project {
-  id       String @id @default(uuid())
-  name     String
-  repoUrl  String
-  repoId   String
-  status   Status
-  ownerId  String
-  slug     String @unique
-  metadata String
-  owner    User   @relation(fields: [ownerId], references: [id])
+  id                 String       @id @default(uuid())
+  name               String
+  repoUrl            String
+  repoId             String
+  status             Status
+  ownerId            String
+  slug               String       @unique
+  stableDeploymentId String?
+  metadata           String
+  owner              User         @relation(fields: [ownerId], references: [id])
+  deployments        Deployment[]
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @default(now()) @updatedAt
 
+  @@index([ownerId])
   @@index([repoId])
+}
+
+model Deployment {
+  id        String   @id @default(uuid())
+  projectId String
+  status    Status
+  logs      Log[]
+  buildId   String
+  project   Project  @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([projectId])
+}
+
+model Log {
+  id           String     @id @default(uuid())
+  content      String
+  timestamp    DateTime
+  deploymentId String
+  deployment   Deployment @relation(fields: [deploymentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
+
+  @@index([deploymentId])
 }
 
 enum Status {
   queued
   cloning
   building
+  deploying
   deployed
   failed
 }

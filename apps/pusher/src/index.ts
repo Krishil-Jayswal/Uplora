@@ -1,3 +1,15 @@
+/*
+  1. Connect to database. -> Done
+  2. Take necessary variables from the message. -> Done
+  3. Get the status and logs from redis. -> Done
+  4. Create a transaction to
+     - Update the project status to current one.
+     - Update the current deploymentId to the current one.
+     - Crearta a new deployment entry for the project.
+     - Create all the logs for the current deployment in batch.
+  5. Change status to deployed in redis.
+*/
+
 import { subscriber } from "@repo/redis/subscriber";
 import { keymanager } from "@repo/redis/managers";
 import { prisma } from "@repo/db";
@@ -28,6 +40,7 @@ class Pusher {
         eachMessage: async ({ message }) => {
           const { id: projectId, buildId: deploymentId }: Pusher_Event =
             JSON.parse(message.value?.toString() || "{}");
+
           const logsKey = keymanager.getLogsKey(projectId);
           const statusKey = keymanager.getStatusKey(projectId);
 
