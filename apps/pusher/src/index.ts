@@ -80,7 +80,7 @@ class Pusher {
                 },
                 data: {
                   stableDeploymentId: buildId,
-                  status,
+                  status: Status.DEPLOYED,
                 },
               });
             }
