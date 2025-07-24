@@ -16,7 +16,7 @@
     "@repo/eslint-config": "*",
     "@repo/nodemon-config": "*",
     "@repo/typescript-config": "*",
-    "@types/express": "^5.0.1",
+    "@types/express": "^5.0.3",
     "@types/http-proxy": "^1.17.16"
   },
   "dependencies": {
