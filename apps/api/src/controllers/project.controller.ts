@@ -1,5 +1,6 @@
 import {
   DeployProjectSchema,
+  GetProjectSchema,
   Job,
   RepoFullnameSchema,
   Status,
@@ -64,6 +65,70 @@ export const deployProject = async (req: Request, res: Response) => {
     res.status(201).json({ id: project.id });
   } catch (error) {
     console.error("Error in deploying project: ", (error as Error).message);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const getProjects = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.user!;
+    const projects = await prisma.project.findMany({
+      where: {
+        ownerId: id,
+      },
+      select: {
+        id: true,
+        name: true,
+        repoUrl: true,
+        slug: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+    res.status(200).json({ projects });
+  } catch (error) {
+    console.error("Error in getting projects: ", (error as Error).message);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const getProject = async (req: Request, res: Response) => {
+  try {
+    const validation = GetProjectSchema.safeParse(req.params);
+    if (!validation.success) {
+      res.status(400).json({ message: "Invalid data format." });
+      return;
+    }
+    const { projectId } = validation.data;
+    const project = await prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        status: true,
+        repoUrl: true,
+        createdAt: true,
+        updatedAt: true,
+        stableDeploymentId: true,
+        deployments: {
+          select: {
+            id: true,
+            status: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 3,
+        },
+      },
+    });
+
+    res.status(200).json({ project });
+  } catch (error) {
+    console.error("Error in getting project: ", (error as Error).message);
     res.status(500).json({ message: "Internal server error." });
   }
 };

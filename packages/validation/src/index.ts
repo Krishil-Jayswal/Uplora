@@ -42,6 +42,10 @@ export const DeployProjectSchema = z.strictObject({
 
 export const RepoFullnameSchema = z.tuple([z.string(), z.string()]);
 
+export const GetProjectSchema = z.strictObject({
+  projectId: z.string(),
+});
+
 export enum Status {
   QUEUED = "queued",
   CLONING = "cloning",

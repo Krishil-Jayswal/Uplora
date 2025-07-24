@@ -23,7 +23,7 @@ export const createJobRequest = (Job: Job) => {
               containers: [
                 {
                   name: "worker",
-                  image: "jkrishil/deploysphere-worker:test",
+                  image: "jkrishil/deploysphere-worker:test2",
                   env: [
                     {
                       name: "JOB_JSON_BASE64",

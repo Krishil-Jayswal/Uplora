@@ -44,7 +44,8 @@ class Pusher {
             buildId,
             status,
           }: Pusher_Event = JSON.parse(message.value?.toString() || "{}");
-
+          const finalStatus =
+            status === Status.DEPLOYING ? Status.DEPLOYED : Status.FAILED;
           const logsKey = keymanager.getLogsKey(projectId);
           const statusKey = keymanager.getStatusKey(projectId);
 
@@ -56,7 +57,7 @@ class Pusher {
             const deployment = await tx.deployment.create({
               data: {
                 buildId,
-                status,
+                status: finalStatus,
                 projectId,
               },
               select: {
@@ -73,14 +74,14 @@ class Pusher {
               }),
             });
 
-            if (status === Status.DEPLOYING) {
+            if (finalStatus === Status.DEPLOYED) {
               await tx.project.update({
                 where: {
                   id: projectId,
                 },
                 data: {
                   stableDeploymentId: buildId,
-                  status: Status.DEPLOYED,
+                  status: finalStatus,
                 },
               });
             }
@@ -88,8 +89,8 @@ class Pusher {
 
           const multi = subscriber.multi();
           multi.del(logsKey);
-          if (status === Status.DEPLOYING) {
-            multi.set(statusKey, Status.DEPLOYED);
+          if (finalStatus === Status.DEPLOYED) {
+            multi.set(statusKey, finalStatus);
           }
           await multi.exec();
         },
