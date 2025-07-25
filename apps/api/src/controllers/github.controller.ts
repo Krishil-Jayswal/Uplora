@@ -71,7 +71,7 @@ export const getRepos = async (req: Request, res: Response) => {
           id: repo.id,
           name: repo.name,
           fullname: repo.full_name,
-          url: repo.clone_url,
+          url: repo.html_url,
           defaultBranch: repo.default_branch,
           private: repo.private,
           createdAt: repo.created_at,
