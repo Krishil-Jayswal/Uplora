@@ -48,6 +48,7 @@ export const githubWebhookHandler = async (req: Request, res: Response) => {
         break;
       }
 
+      // Check for head ref to default branch
       case GithubEventType.Push: {
         const validation = GithubWebhookPushEventSchema.safeParse(req.body);
         if (validation.success) {

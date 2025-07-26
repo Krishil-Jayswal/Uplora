@@ -12,6 +12,7 @@
     "db:generate": "cd packages/db && prisma generate",
     "db:migrate": "cd packages/db && prisma migrate dev",
     "db:reset": "cd packages/db && prisma migrate reset",
+    "db:studio": "cd packages/db && prisma studio",
     "kafka:migrate": "cd packages/kafka && npm run build && node ./dist/migration.js"
   },
   "devDependencies": {
