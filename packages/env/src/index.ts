@@ -13,6 +13,7 @@ const EnvSchema = z.object({
 
   API_PORT: z.string().default("API Server Port"),
   CDN_PORT: z.string().default("CDN Server Port"),
+  WS_PORT: z.string().default("WS Server Port"),
 
   JWT_SECRET: z.string().default("JWT Secret"),
   MAX_AGE: z.string().default("Token Max Age"),
