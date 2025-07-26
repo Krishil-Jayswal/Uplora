@@ -34,7 +34,7 @@ const ProjectMetadataSchema = z.strictObject({
   ),
 });
 
-export const DeployProjectSchema = z.strictObject({
+export const CreateProjectSchema = z.strictObject({
   repoFullName: z.string().trim(),
   name: z.string().trim(),
   metadata: ProjectMetadataSchema,
@@ -42,8 +42,12 @@ export const DeployProjectSchema = z.strictObject({
 
 export const RepoFullnameSchema = z.tuple([z.string(), z.string()]);
 
-export const GetProjectSchema = z.strictObject({
+export const ProjectIdSchema = z.strictObject({
   projectId: z.string(),
+});
+
+export const DeploymentIdSchema = z.strictObject({
+  deploymentId: z.string(),
 });
 
 export const GithubWebhookPushEventSchema = z.object({

@@ -1,7 +1,6 @@
 import {
-  DeployProjectSchema,
-  GetProjectSchema,
-  Job,
+  CreateProjectSchema,
+  ProjectIdSchema,
   RepoFullnameSchema,
   Status,
 } from "@repo/validation";
@@ -11,10 +10,11 @@ import { prisma } from "@repo/db";
 import { generateSlug } from "../lib/slug.js";
 import { producer } from "@repo/kafka/producer";
 import { Topic } from "@repo/kafka/meta";
+import { createDeploymentJob } from "../lib/job.js";
 
-export const deployProject = async (req: Request, res: Response) => {
+export const createProject = async (req: Request, res: Response) => {
   try {
-    const validation1 = DeployProjectSchema.safeParse(req.body);
+    const validation1 = CreateProjectSchema.safeParse(req.body);
     if (!validation1.success) {
       res.status(400).json({ message: "Invalid data format." });
       return;
@@ -48,15 +48,7 @@ export const deployProject = async (req: Request, res: Response) => {
       },
     });
 
-    const Job: Job = {
-      id: project.id,
-      name: project.name,
-      repoUrl: project.repoUrl,
-      slug,
-      installationId: installationId!,
-      metadata,
-    };
-
+    const Job = createDeploymentJob(project, installationId!);
     await producer.send({
       topic: Topic.JOB,
       messages: [{ value: JSON.stringify(Job), key: id }],
@@ -65,6 +57,89 @@ export const deployProject = async (req: Request, res: Response) => {
     res.status(201).json({ id: project.id });
   } catch (error) {
     console.error("Error in deploying project: ", (error as Error).message);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const getProject = async (req: Request, res: Response) => {
+  try {
+    const validation = ProjectIdSchema.safeParse(req.params);
+    if (!validation.success) {
+      res.status(400).json({ message: "Invalid data format." });
+      return;
+    }
+
+    const { projectId } = validation.data;
+
+    const project = await prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        status: true,
+        repoUrl: true,
+        createdAt: true,
+        updatedAt: true,
+        deployments: {
+          select: {
+            id: true,
+            status: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 3,
+        },
+        _count: {
+          select: {
+            deployments: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ project });
+  } catch (error) {
+    console.error("Error in getting project: ", (error as Error).message);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const getStatus = async (req: Request, res: Response) => {
+  try {
+    const validation = ProjectIdSchema.safeParse(req.params);
+    if (!validation.success) {
+      res.status(400).json({ message: "Invalid data format." });
+      return;
+    }
+
+    const { projectId } = validation.data;
+    const { id } = req.user!;
+
+    const project = await prisma.project.findUnique({
+      where: {
+        id: projectId,
+        ownerId: id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    if (!project) {
+      res.status(404).json({ message: "Project not found." });
+      return;
+    }
+
+    res.status(200).json({ status: project.status });
+  } catch (error) {
+    console.error(
+      "Error in getting project status: ",
+      (error as Error).message,
+    );
     res.status(500).json({ message: "Internal server error." });
   }
 };
@@ -88,47 +163,6 @@ export const getProjects = async (req: Request, res: Response) => {
     res.status(200).json({ projects });
   } catch (error) {
     console.error("Error in getting projects: ", (error as Error).message);
-    res.status(500).json({ message: "Internal server error." });
-  }
-};
-
-export const getProject = async (req: Request, res: Response) => {
-  try {
-    const validation = GetProjectSchema.safeParse(req.params);
-    if (!validation.success) {
-      res.status(400).json({ message: "Invalid data format." });
-      return;
-    }
-    const { projectId } = validation.data;
-    const project = await prisma.project.findUnique({
-      where: {
-        id: projectId,
-      },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        status: true,
-        repoUrl: true,
-        createdAt: true,
-        updatedAt: true,
-        stableDeploymentId: true,
-        deployments: {
-          select: {
-            id: true,
-            status: true,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-          take: 3,
-        },
-      },
-    });
-
-    res.status(200).json({ project });
-  } catch (error) {
-    console.error("Error in getting project: ", (error as Error).message);
     res.status(500).json({ message: "Internal server error." });
   }
 };
