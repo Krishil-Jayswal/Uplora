@@ -7,6 +7,9 @@ import {
   Oauth_Type,
 } from "@repo/validation";
 import { Request, Response } from "express";
+import { createDeploymentJob } from "../lib/job.js";
+import { producer } from "@repo/kafka/producer";
+import { Topic } from "@repo/kafka/meta";
 
 export const githubWebhookHandler = async (req: Request, res: Response) => {
   try {
@@ -16,7 +19,9 @@ export const githubWebhookHandler = async (req: Request, res: Response) => {
       res.status(400).json({ message: "Unknown event" });
       return;
     }
+
     const { "x-github-event": event } = eventValidation.data;
+
     switch (event) {
       case GithubEventType.Installation: {
         const validation = GithubWebhookInstallationEventSchema.safeParse(
@@ -28,47 +33,55 @@ export const githubWebhookHandler = async (req: Request, res: Response) => {
               account: { id },
             },
           } = validation.data;
-          // Delete the installationId from database by finding the user from oauthId: id, oauthType: Oauth_Type: GITHUB
-          const user = await prisma.user.findUnique({
+          await prisma.user.update({
             where: {
               oauthType_oauthId: {
                 oauthId: id.toString(),
                 oauthType: Oauth_Type.GITHUB,
               },
             },
+            data: {
+              installationId: null,
+            },
           });
-          console.log(user);
         }
         break;
       }
+
       case GithubEventType.Push: {
         const validation = GithubWebhookPushEventSchema.safeParse(req.body);
         if (validation.success) {
           const {
             repository: { id },
+            installation: { id: installationId },
           } = validation.data;
-          // Filter projects on installationId and submit a deployment job for each project.
+
           const projects = await prisma.project.findMany({
             where: {
               repoId: id.toString(),
             },
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              repoUrl: true,
-              owner: {
-                select: {
-                  installationId: true,
-                },
-              },
-              metadata: true,
-            },
           });
-          console.log(projects);
+
+          await Promise.all(
+            projects.map((project) => {
+              const Job = createDeploymentJob(
+                project,
+                installationId.toString(),
+              );
+              return producer.send({
+                topic: Topic.JOB,
+                messages: [
+                  { value: JSON.stringify(Job), key: project.ownerId },
+                ],
+              });
+            }),
+          );
         }
+
+        break;
       }
     }
+
     res.status(200).json({ message: "Event processed." });
   } catch (error) {
     console.error(

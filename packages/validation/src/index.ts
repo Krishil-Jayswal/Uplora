@@ -54,6 +54,9 @@ export const GithubWebhookPushEventSchema = z.object({
   repository: z.object({
     id: z.number(),
   }),
+  installation: z.object({
+    id: z.number(),
+  }),
 });
 
 export const GithubWebhookInstallationEventSchema = z.object({
