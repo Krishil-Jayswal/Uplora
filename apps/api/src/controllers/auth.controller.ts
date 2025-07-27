@@ -83,6 +83,7 @@ export const me = async (req: Request, res: Response) => {
       user: {
         ...user,
         installation: user.installationId ? true : false,
+        installationId: undefined,
       },
     });
   } catch (error) {
