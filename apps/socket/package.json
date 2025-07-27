@@ -19,6 +19,7 @@
     "@types/ws": "^8.18.1"
   },
   "dependencies": {
+    "@repo/db": "*",
     "@repo/env": "*",
     "@repo/jwt": "*",
     "@repo/redis": "*",

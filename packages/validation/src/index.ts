@@ -106,7 +106,6 @@ export enum Event_Type {
 
 export type Job = {
   id: string;
-  name: string;
   repoUrl: string;
   installationId: string;
   slug: string;

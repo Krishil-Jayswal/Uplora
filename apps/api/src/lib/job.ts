@@ -6,7 +6,6 @@ export const createDeploymentJob = (
 ): Job => {
   return {
     id: project.id,
-    name: project.name,
     metadata: JSON.parse(project.metadata),
     repoUrl: project.repoUrl,
     slug: project.slug,

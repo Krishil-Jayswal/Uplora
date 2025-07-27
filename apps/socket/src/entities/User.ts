@@ -1,6 +1,7 @@
 import { SubscribeMessageSchema } from "@repo/validation";
 import { WebSocket } from "ws";
 import { EventManager } from "../managers/EventManager.js";
+import { prisma } from "@repo/db";
 
 export class User {
   private userId: string;
@@ -17,12 +18,21 @@ export class User {
   }
 
   private addListeners() {
-    this.socket.on("message", (data) => {
+    this.socket.on("message", async (data) => {
       try {
         const message = SubscribeMessageSchema.parse(
           JSON.parse(data.toString()),
         );
-        console.log(message);
+        const project = await prisma.project.findUnique({
+          where: {
+            id: message.projectId,
+            ownerId: this.userId,
+          },
+          select: {
+            id: true,
+          },
+        });
+        if (!project) return;
         EventManager.getInstance().subscribe(this.userId, message.projectId);
       } catch (error) {
         console.error("Error in message handler: ", (error as Error).message);
