@@ -68,6 +68,11 @@ export const GithubWebhookInstallationEventSchema = z.object({
   }),
 });
 
+export const SubscribeMessageSchema = z.strictObject({
+  type: z.literal("SUBSCRIBE"),
+  projectId: z.string().min(1),
+});
+
 export enum GithubEventType {
   Installation = "installation",
   Push = "push",
@@ -124,3 +129,5 @@ export type Pusher_Event = {
   buildId: string;
   status: Status;
 };
+
+export type SubscribeMessage = z.infer<typeof SubscribeMessageSchema>;
