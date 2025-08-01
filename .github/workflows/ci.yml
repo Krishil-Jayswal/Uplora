@@ -1,37 +1,37 @@
-name: Lint and Build Pipeline
+name: Lint and Build Test Pipeline
 
-on: 
-    push: 
-        branches: 
-            - main
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-    lint-and-build-test:
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
+  lint-and-build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
-        env:
-          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN}}
-          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN}}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
-        steps:
-            - name: Checkout the repository
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js environment
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 22
-                  cache: 'npm'
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
 
-            - name: Install dependencies
-              run: npm install
+      - name: Install dependencies
+        run: npm install
 
-            - name: Generate client
-              run: npm run db:generate
+      - name: Generate client
+        run: npm run db:generate
 
-            - name: Lint the code
-              run: npm run lint
+      - name: Lint Test
+        run: npm run lint
 
-            - name: Build the code
-              run: npm run build
+      - name: Build Test
+        run: npm run build
