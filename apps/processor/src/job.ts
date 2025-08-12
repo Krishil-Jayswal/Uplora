@@ -7,7 +7,7 @@ export const createJobRequest = (Job: Job) => {
   );
   const batchV1ApiCreateNamespacedJobRequest: BatchV1ApiCreateNamespacedJobRequest =
     {
-      namespace: "default",
+      namespace: "deploysphere",
       body: {
         kind: "Job",
         apiVersion: "batch/v1",
@@ -23,7 +23,7 @@ export const createJobRequest = (Job: Job) => {
               containers: [
                 {
                   name: "worker",
-                  image: "jkrishil/deploysphere-worker:test2",
+                  image: "jkrishil/deploysphere-worker:test",
                   env: [
                     {
                       name: "JOB_JSON_BASE64",
@@ -43,7 +43,7 @@ export const createJobRequest = (Job: Job) => {
                 {
                   name: "secret",
                   secret: {
-                    secretName: "deploy-sphere-secret",
+                    secretName: "deploysphere-secret",
                     items: [
                       {
                         key: ".env",
