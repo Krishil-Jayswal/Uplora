@@ -96,7 +96,7 @@ jobs:
             git config user.name "GitHub Actions Bot"
             git config user.email "actions@github.com"
             echo '${{ needs.ignore-check.outputs.build_matrix }}' | jq -r '.[]' | while read -r app_name; do
-              sed -i "s|image:${{ secrets.DOCKERHUB_USERNAME }}/deploysphere-${app_name}:.*|image:${{ secrets.DOCKERHUB_USERNAME }}/deploysphere-${app_name}:${{ github.sha }}|" "deploysphere/${app_name}-deployment.yml"
+              sed -i "s|image:${{ secrets.DOCKERHUB_USERNAME }}/deploysphere-${app_name}:.*|image:${{ secrets.DOCKERHUB_USERNAME }}/deploysphere-${app_name}:${{ github.sha }}|" "deploysphere/apps/${app_name}.yml"
               git add "deploysphere/${app_name}-deployment.yml"
               git commit -m "Update deploysphere-${app_name} image to ${{ github.sha }}"
             done
